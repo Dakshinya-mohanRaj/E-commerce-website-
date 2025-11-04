@@ -201,7 +201,7 @@
         await signInWithEmailAndPassword(auth, email, password);
         errorMsg.textContent = "";
         showToast('💅 Successfully Logged In!');
-        setTimeout(() => window.location.href = 'index.html', 2000);
+        setTimeout(() => window.location.href = 'home.html', 2000);
       } catch (error) {
         errorMsg.textContent = "⚠️ " + error.message;
       }
