@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>NailArt Haven - Shop</title>
+    <style>
+        .toast{position:fixed;left:50%;bottom:40px;transform:translate(-50%,60px) scale(.8);background:linear-gradient(135deg,rgba(222,97,182,.85),rgba(255,140,171,.85));color:#fff;padding:18px 30px;border-radius:16px;font:1rem "Poppins",sans-serif;backdrop-filter:blur(12px) saturate(180%);box-shadow:0 0 25px rgba(255,105,180,.6);display:flex;align-items:center;gap:12px;opacity:0;overflow:hidden;z-index:2000}
+        .toast::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(255,255,255,.7) 1px,transparent 1px);background-size:20px 20px;animation:sparkleMove 5s linear infinite;opacity:.4}
+        .toast::after{content:'';position:absolute;top:0;left:-150%;width:150%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.5),transparent);animation:shimmerSlide 2.5s infinite}
+        .toast.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1);animation:toastPop .8s ease-out forwards}
+        .toast.hide{opacity:0;transform:translateX(-50%) translateY(60px) scale(.8);transition:opacity .4s ease,transform .4s ease}
+        @keyframes toastPop{0%{opacity:0;transform:translateX(-50%) translateY(60px) scale(.8);box-shadow:0 0 10px rgba(255,105,180,.3)}50%{transform:translateX(-50%) translateY(-10px) scale(1.05);box-shadow:0 0 45px rgba(255,105,180,.7)}100%{opacity:1;transform:translateX(-50%) translateY(0) scale(1);box-shadow:0 0 25px rgba(255,105,180,.5)}}
+        @keyframes sparkleMove{0%{background-position:0 0}100%{background-position:50px 50px}}
+        @keyframes shimmerSlide{0%{left:-150%}100%{left:150%}}
+        body::before{content:'';position:fixed;top:0;left:0;width:200%;height:200%;background:linear-gradient(270deg,#ff9a9e,#fad0c4,#fcb69f,#a1c4fd,#c2e9fb);background-size:1000% 1000%;animation:gradientWave 20s ease infinite;z-index:-2;filter:blur(60px)}
+        @keyframes gradientWave{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+        header{background:linear-gradient(135deg,#ff6b9d,#ff8fab);color:#fff;padding:1rem;text-align:center;box-shadow:0 4px 10px rgba(0,0,0,.1);position:relative;z-index:1;overflow:hidden;animation:fadeSlideDown 1.2s ease-out both}
+        @keyframes fadeSlideDown{0%{opacity:0;transform:translateY(-40px)}60%{opacity:1;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+        nav{background:rgba(255,255,255,.9);padding:.5rem;display:flex;justify-content:center;align-items:center;gap:1rem;position:relative;z-index:1}
+        nav a{color:#ff6b9d;text-decoration:none;font-weight:700;transition:color .3s}
+        nav a:hover{color:#ff8fab}
+        .dropdown img{width:40px;height:40px;border-radius:50%;cursor:pointer}
+        .dropdown div button{background:linear-gradient(135deg,#ff69b4,#e91e63);color:#fff;border:none;padding:.6rem;border-radius:8px;cursor:pointer;margin-bottom:.5rem;width:100%;font-weight:700;font-family:"Poppins",sans-serif;font-size:.95rem;transition:.4s ease-in-out;box-shadow:0 0 15px rgba(255,105,180,.6),0 0 25px rgba(233,30,99,.4);animation:glowPulse 2s infinite alternate}
+        .dropdown div button:hover{transform:scale(1.07);box-shadow:0 0 25px rgba(255,105,180,.9),0 0 50px rgba(233,30,99,.7)}
+        @keyframes glowPulse{from{box-shadow:0 0 10px rgba(255,105,180,.5),0 0 20px rgba(233,30,99,.3)}to{box-shadow:0 0 25px rgba(255,105,180,.9),0 0 45px rgba(233,30,99,.7)}}
+        .dropdown div button:last-child{margin-bottom:0}
+        .container{max-width:1200px;margin:0 auto;padding:2rem;position:relative;z-index:1}
+        .products{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem;margin-bottom:2rem}
+        .product{background:rgba(255,255,255,.9);border-radius:15px;padding:1.5rem;box-shadow:0 8px 25px rgba(0,0,0,.15);text-align:center;transition:.3s;position:relative;overflow:hidden}
+        .product::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,107,157,.1),transparent);transition:.5s}
+        .product:hover::before{left:100%}
+        .product:hover{transform:translateY(-10px) rotateX(5deg);box-shadow:0 15px 40px rgba(0,0,0,.2)}
+        .product img{max-width:100%;height:200px;object-fit:cover;border-radius:10px;margin-bottom:1rem}
+        .product h3{color:#ff6b9d;margin:1rem 0 .5rem}
+        .product p{color:#666}
+        .price{font-size:1.5rem;color:#e70f57;font-weight:700}
+        button.addCartBtn{background:linear-gradient(135deg,#d63384 0%,#ff4da6 100%);color:#fff;border:none;padding:.75rem 1.5rem;border-radius:8px;cursor:pointer;margin-top:.5rem;transition:.25s;box-shadow:0 0 15px rgba(255,77,166,.3)}
+        button.addCartBtn:hover{transform:scale(1.1);box-shadow:0 0 25px rgba(255,77,166,.8);background:linear-gradient(135deg,#ff1e78 0%,#ff6fb7 100%)}
+        .cart{background:rgba(255,255,255,.9);padding:1.5rem;border-radius:15px;box-shadow:0 8px 25px rgba(0,0,0,.15);margin-top:2rem}
+        .cart h2{color:#d63384;margin-top:0;text-shadow:0 0 8px rgba(235,8,159,.6)}
+        .cart-item{display:flex;justify-content:space-between;margin-bottom:.5rem;padding-bottom:.5rem;border-bottom:1px solid #ddd}
+        .total{font-size:1.2rem;font-weight:700;text-align:right;color:#e00b56}
+        .search-bar{display:flex;justify-content:center;margin:40px 0}
+        #searchInput{width:70%;padding:12px;border:2px solid #ff69b4;border-radius:10px 0 0 10px;font-size:1rem;font-family:"Poppins",sans-serif;background:rgba(255,255,255,.9);transition:.3s}
+        #searchBtn{background:linear-gradient(135deg,#ff69b4,#e91e63);color:#fff;border:none;padding:12px 20px;border-radius:0 10px 10px 0;cursor:pointer;font-size:1rem;font-family:"Poppins",sans-serif;transition:.3s;position:relative;overflow:hidden}
+        section.cart button{background:linear-gradient(135deg,#ff69b4,#e91e63,#7b1fa2);color:#fff;border:none;padding:10px 20px;border-radius:8px;margin-top:10px;cursor:pointer;font-size:1rem;font-family:"Poppins",sans-serif;font-weight:500;transition:.3s;position:relative;overflow:hidden;display:block;margin:auto}
+        section.cart button:hover{background:linear-gradient(135deg,#e43b95,#ff1493,#4a0072);box-shadow:0 0 15px rgba(255,105,180,.8),0 0 25px rgba(123,31,162,.5);transform:scale(1.05);animation:pulse 1.5s infinite ease-in-out}
+        #imagePopup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);display:flex;justify-content:center;align-items:center;z-index:9999;opacity:0;pointer-events:none;transition:.35s ease}
+        #imagePopup.show{opacity:1;pointer-events:all}
+        #imagePopup .popup-inner{position:relative;max-width:92%;max-height:84%;display:flex;align-items:center;justify-content:center;padding:14px;border-radius:12px}
+        #imagePopup img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.6);transform:scale(.92);transition:.35s ease}
+        #imagePopup.show img{transform:scale(1);filter:drop-shadow(0 8px 30px rgba(255,105,180,.08))}
+        #imagePopup .close-btn{position:absolute;top:12px;right:16px;color:#000;font-size:1.4rem;background:none;border:none;cursor:pointer;padding:4px 6px;line-height:1;font-weight:400;transition:.2s ease;z-index:10000}
+        #ordersSection{display:none;padding:40px 20px;text-align:center;background:linear-gradient(180deg,#fff0f5,#ffe4f1);font-family:"Poppins",sans-serif;animation:fadeIn .5s ease;max-height:0;overflow:hidden;transition:.8s ease;opacity:0}
+        #ordersSection h2{color:#e91e63;font-size:1.8rem;margin-bottom:20px}
+        .order-card{background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(255,105,180,.3);margin:15px auto;padding:20px;width:90%;max-width:500px;text-align:left;transform:translateY(20px);opacity:0;animation:slideUp .6s ease forwards}
+        .order-card img{width:60px;height:60px;border-radius:10px;object-fit:cover;margin-right:10px}
+        .order-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+        .order-items{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+        .order-total{color:#e91e63;font-weight:700;margin-top:10px}
+        @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+        #ordersSection.show{display:block;max-height:1000px;opacity:1}
+        :root{--bg-light:linear-gradient(270deg,#ff9a9e,#fad0c4,#fcb69f,#a1c4fd,#c2e9fb);--card-light:rgba(255,255,255,.9);--accent-pink:#ff69b4;--accent-deep:#e91e63;--text-dark:#333;--text-light:#fff}
+        body.dark-theme{--bg-main:linear-gradient(180deg,#021033,#06204a 60%,#08294f);--card:rgba(8,26,56,.85);--accent:#58a6ff;--accent2:#9b59ff;color:var(--text-light);transition:.6s ease}
+        body{background:var(--bg-main,var(--bg-light));color:var(--text-dark);transition:.6s ease}
+        .payment-content,.product,.cart,.order-card,header,nav,footer{transition:.4s ease}
+        body.dark-theme .payment-content,body.dark-theme .product,body.dark-theme .cart,body.dark-theme .order-card,body.dark-theme header,body.dark-theme nav,body.dark-theme footer{background:var(--card);box-shadow:0 8px 30px rgba(10,20,40,.5);color:var(--text-light)}
+        #themeToggle{accent-color:#ff69b4}
+        #bubbleContainer{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:-3}
+        .bubble{position:absolute;bottom:-150px;border-radius:50%;opacity:.18;animation:rise 18s infinite ease-in;filter:blur(6px)}
+        .bubble.small{width:60px;height:60px}.bubble.medium{width:110px;height:110px}.bubble.large{width:200px;height:200px}
+        body:not(.dark-theme) .bubble.blue{background:rgba(161,196,253,.28)}body:not(.dark-theme) .bubble.pink{background:rgba(255,182,193,.22)}body:not(.dark-theme) .bubble.purple{background:rgba(194,233,251,.16)}
+        body.dark-theme .bubble.blue{background:rgba(80,160,255,.18)}body.dark-theme .bubble.pink{background:rgba(155,89,255,.12)}body.dark-theme .bubble.purple{background:rgba(0,120,200,.12)}
+        @keyframes rise{0%{transform:translateY(0) scale(.9);opacity:0}10%{opacity:.12}50%{opacity:.18}100%{transform:translateY(-130vh) scale(1.2);opacity:0}}
+        @media(max-width:720px){.bubble.large{display:none}.bubble.medium{width:80px;height:80px}}
+        #notifyBell{font-size:1.3rem;color:#ff69b4;margin-left:8px;position:relative;cursor:pointer;transition:.3s ease}
+        #notifyBell::after{content:'';position:absolute;top:0;right:0;width:8px;height:8px;background:#ff4081;border-radius:50%;opacity:0;transform:scale(0);transition:.3s ease}
+        #notifyBell.new::after{opacity:1;transform:scale(1)}
+        #notifyBell.animate{animation:bellWiggle 1.2s ease-in-out;color:#ff4081}
+        @keyframes bellWiggle{0%,100%{transform:rotate(0)}20%{transform:rotate(-15deg)}40%{transform:rotate(10deg)}60%{transform:rotate(-10deg)}80%{transform:rotate(6deg)}}
+        .sparkle{position:fixed;width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:9999;animation:sparkleFade 1s ease-out forwards}
+        @keyframes sparkleFade{0%{opacity:.9;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}100%{opacity:0;transform:scale(.5)}}
+        .order-items{display:flex;gap:10px;margin:10px 0;flex-wrap:wrap}
+        .order-items img{width:60px;height:60px;object-fit:cover;border-radius:10px;box-shadow:0 3px 6px rgba(0,0,0,.1);transition:.3s}
+        .order-items img:hover{transform:scale(1.1)}
+        .search-box{position:relative;display:inline-flex;align-items:center}
+        .search-box input[type=search],.search-box input[type=text]{padding-right:38px!important}
+        .search-box #searchClearBtn{position:absolute;right:48px;top:50%;transform:translateY(-50%);font-size:18px;cursor:pointer;color:#ff6b9d;opacity:0;pointer-events:none;transition:.3s}
+        body.dark-theme .search-box #searchClearBtn{color:#58a6ff}
+        .search-box #searchClearBtn.visible{opacity:.8;pointer-events:auto}
+        .search-box #searchClearBtn:hover{opacity:1;color:#ff4081}
+        body.dark-theme .search-box #searchClearBtn:hover{color:#9b59ff}
+        .payment-option{display:flex;align-items:center;gap:8px;font-size:1rem;color:#333;cursor:pointer}
+        .payment-option input[type=radio]{transform:scale(1.2);accent-color:#ff69b4;margin-right:6px}
+        </style>        
+<style>
+/* === Orange Glow Effect for Buy Now Button === */
+.buyNowBtn {
+  background: rgba(255, 69, 0, 0.85);
+  color: white;
+  padding: 10px 20px;
+  margin: 5px 0 5px 5px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  box-shadow: 0 0 12px rgba(255, 69, 0, 0.4);
+}
+.buyNowBtn:hover {
+  background: rgba(255, 100, 0, 0.95);
+  box-shadow: 0 0 25px rgba(255, 140, 0, 0.9), 0 0 40px rgba(255, 69, 0, 0.6);
+  transform: scale(1.08);}
+.buyNowBtn:active {transform: scale(0.96);
+  box-shadow: 0 0 15px rgba(255, 69, 0, 0.9);}
+/* Subtle continuous glowing effect */
+.buyNowBtn:hover {animation: orangeGlow 1.5s infinite alternate;}
+@keyframes orangeGlow {
+  0% {box-shadow: 0 0 10px rgba(255, 0, 64, 0.6);}
+  50% {box-shadow: 0 0 25px rgba(255, 140, 0, 1);}
+  100% {box-shadow: 0 0 10px rgba(255, 69, 0, 0.6);}}
+</style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <h1>✨ Welcome to NailArt Haven ✨</h1>
+<p>Your one-stop shop for premium nail art products!</p>
+        <div class="dropdown">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAeiALIvxB-otJzFVdxK0Uu3jNMQrWBu55d8pbk4tZaBO4lC2vPiriXNWWizZFLf9Raos&usqp=CAU" alt="Profile" id="profileBtn">
+            <div id="profileMenu" style="display:none;">
+                <p id="userInfo">User</p>
+                <button id="ordersBtn">View Orders</button>
+                <button id="logoutBtn">Logout</button>
+            </div>
+        </div>
+    </header>
+    <!-- Navigation -->
+    <nav>
+        <a href="#">Home</a>
+        <a href="#">Shop</a>
+        <a href="#">Contact</a>
+        <input type="checkbox" id="themeToggle" title="Toggle Theme">
+    </nav>
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search products...">
+            <span id="searchClearBtn">×</span>
+        </div>
+        <button id="searchBtn">Search</button>
+    </div>
+    <!-- Main Content -->
+    <div class="container">
+        <div class="products">
+          <!-- 20 Nail Products -->
+          <div class="product "><img src="p1.jpeg" alt="Base Coat"><h3>Base Coat</h3><p>Strengthening base layer for perfect nails.</p><div class="price">₹399</div><button class="addCartBtn" onclick="addToCart('Base Coat',399,'p1.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Base Coat',399,'p1.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p2.jpeg" alt="Top Coat"><h3>Top Coat</h3><p>Flexible and durable gel for nail sculpting.</p><div class="price">₹799</div><button class="addCartBtn" onclick="addToCart('Poly Gel',799,'p2.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Poly Gel',799,'p2.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p3.jpeg" alt="Press-on Nails"><h3>Press-on Nails</h3><p>Quick and stylish nails for everyday wear.</p><div class="price">₹599</div><button class="addCartBtn" onclick="addToCart('Press-on Nails',599,'p3.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Press-on Nails',599,'p3.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p4.jpeg" alt="Nail Wipes"><h3>Nail Wipes</h3><p>Essential wipes for clean and prepped nails.</p><div class="price">₹149</div><button class="addCartBtn" onclick="addToCart('Nail Wipes',149,'p4.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Nail Wipes',149,'p4.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p5.jpeg" alt="Nail Remover"><h3>Nail Remover</h3><p>Gentle formula to remove polish easily.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Nail Remover',199,'p5.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Nail Remover',199,'p5.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p6.jpeg" alt="Shell Nail Polish"><h3>Shell Nail Polish</h3><p>Shimmering shell effect for a glossy finish.</p><div class="price">₹499</div><button class="addCartBtn" onclick="addToCart('Shell Nail Polish',499,'p6.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Shell Nail Polish',499,'p6.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p7.jpeg" alt="UV Curing Lamp"><h3>UV Curing Lamp</h3><p>Fast curing for gels and poly nails.</p><div class="price">₹1299</div><button class="addCartBtn" onclick="addToCart('UV Curing Lamp',1299,'p7.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('UV Curing Lamp',1299,'p7.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p8.jpeg" alt="Nail Art Brushes"><h3>Nail Art Brushes</h3><p>Precision brushes for creative designs.</p><div class="price">₹299</div><button class="addCartBtn" onclick="addToCart('Nail Art Brushes',299,'p8.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Nail Art Brushes',299,'p8.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p9.jpeg" alt="Glitter Stickers"><h3>Glitter Stickers</h3><p>Add sparkle to nails easily.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Glitter Stickers',199,'p9.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Glitter Stickers',199,'p9.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="P10.jpeg" alt="3D Nail Charms"><h3>3D Nail Charms</h3><p>Dimensional charms for artistic nails.</p><div class="price">₹299</div><button class="addCartBtn" onclick="addToCart('3D Nail Charms',299,'p10.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('3D Nail Charms',299,'p10.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p11.jpeg" alt="Holographic Nail Polish"><h3>Holographic Nail Polish</h3><p>Rainbow shifting colors for nails.</p><div class="price">₹399</div><button class="addCartBtn" onclick="addToCart('Holographic Nail Polish',399,'p11.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Holographic Nail Polish',399,'p11.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p12.jpeg" alt="Milky Manicure Polish"><h3>Milky Manicure Polish</h3><p>Soft white polish for subtle nails.</p><div class="price">₹299</div><button class="addCartBtn" onclick="addToCart('Milky Manicure Polish',299,'p12.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Milky Manicure Polish',299,'p12.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p13.jpeg" alt="French Tip Stickers"><h3>French Tip Stickers</h3><p>Classic French tips made easy.</p><div class="price">₹149</div><button class="addCartBtn" onclick="addToCart('French Tip Stickers',149,'p13.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('French Tip Stickers',149,'p13.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p14.jpeg" alt="Customizable Nail Decals"><h3>Customizable Nail Decals</h3><p>Create your unique nail style.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Customizable Nail Decals',199,'p14.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Customizable Nail Decals',199,'p14.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p15.jpeg" alt="Soft Pastel Gel Polish"><h3>Soft Pastel Gel Polish</h3><p>Long-wear gentle pastel gels.</p><div class="price">₹399</div><button class="addCartBtn" onclick="addToCart('Soft Pastel Gel Polish',399,'p15.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Soft Pastel Gel Polish',399,'p15.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p16.jpeg" alt="Bold Neon Nail Polish"><h3>Bold Neon Nail Polish</h3><p>Bright neon colors for fun nails.</p><div class="price">₹299</div><button class="addCartBtn" onclick="addToCart('Bold Neon Nail Polish',299,'p16.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Bold Neon Nail Polish',299,'p16.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p17.jpeg" alt="Matte Rose Nail Polish"><h3>Matte Rose Nail Polish</h3><p>Velvet matte rose pink shade.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Matte Rose Nail Polish',199,'p17.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Matte Rose Nail Polish',199,'p17.html')">Buy Now</button></div>
+          <div class="product"><img src="p18.jpeg" alt="Pastel Lavender Nail Polish"><h3>Pastel Lavender Nail Polish</h3><p>Soft pastel lavender with creamy texture.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Pastel Lavender Nail Polish',199,'p18.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Pastel Lavender Nail Polish',199,'p18.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p19.jpeg" alt="Chrome Mirror Nail Polish"><h3>Chrome Mirror Nail Polish</h3><p>Metallic mirror silver finish for trendy nails.</p><div class="price">₹249</div><button class="addCartBtn" onclick="addToCart('Chrome Mirror Nail Polish',249,'p19.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Chrome Mirror Nail Polish',249,'p19.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p20.jpg" alt="Overnight Repair Treatment"><h3>Overnight Repair Treatment</h3><p>Softens and repairs nails overnight.</p><div class="price">₹399</div><button class="addCartBtn" onclick="addToCart('Overnight Repair Treatment',399,'p20.jpg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Overnight Repair Treatment',399,'p20.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p21.jpeg" alt="Healthy Glow Duo"><h3>Healthy Glow Duo</h3><p>Set for natural shine and strength.</p><div class="price">₹499</div><button class="addCartBtn" onclick="addToCart('Healthy Glow Duo',499,'p21.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Healthy Glow Duo',499,'p21.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p22.jpeg" alt="Almond Nail Tips"><h3>Almond Nail Tips</h3><p>Sleek almond-shaped extensions.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Almond Nail Tips',199,'p22.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Almond Nail Tips',199,'p22.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p23.jpeg" alt="Red Ruby Gel Polish"><h3>Red Ruby Gel Polish</h3><p>Deep glossy red for gel-style shine.</p><div class="price">₹249</div><button class="addCartBtn" onclick="addToCart('Red Ruby Gel Polish',249,'p23.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Red Ruby Gel Polish',249,'p23.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p24.jpeg" alt="Pearlized Shell Nail Polish"><h3>Pearlized Shell Nail Polish</h3><p>Soft pearl finish for nails.</p><div class="price">₹200</div><button class="addCartBtn" onclick="addToCart('Pearlized Shell Nail Polish',200,'p24.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Pearlized Shell Nail Polish',200,'p24.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p25.jpeg" alt="Iridescent Shell Nail Polish"><h3>Iridescent Shell Nail Polish</h3><p>Color-shifting nail polish.</p><div class="price">₹249</div><button class="addCartBtn" onclick="addToCart('Iridescent Shell Nail Polish',249,'p25.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Iridescent Shell Nail Polish',249,'p25.jpeg')">Buy Now</button></div>
+        </div>
+        <section class="cart">
+          <h2>Shopping Cart</h2>
+          <div id="cart-items"></div>
+          <div class="total" id="cart-total">Total: ₹0</div>
+          <button onclick="openPayment()">Checkout</button>
+        </section>
+      </div>
+    <!-- Image Zoom Popup -->
+    <div aria-hidden="true" id="imagePopup">
+        <div class="popup-inner">
+            <button aria-label="Close image" class="close-btn" id="closeImageBtn">✖</button>
+            <img alt="Zoomed product image" id="popupImage" src=""/>
+        </div>
+    </div>
+    <!-- Toast Message -->
+    <div id="toast" class="toast"></div>
+    <!-- Firebase Initialization -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    </script>
+    <!-- Core Functionality -->
+    <script>
+        let cart = [];
+        function addToCart(name, price) {
+            const existing = cart.find(item => item.name === name);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ name, price, qty: 1 });}
+            updateCart();
+            showToast(`${name} added to cart!`);}
+        function updateCart() {
+            const cartItems = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+            cartItems.innerHTML = '';
+            let total = 0;
+            cart.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `<span>${item.name} x${item.qty} - ₹${item.price * item.qty}</span>
+                                <button onclick="removeFromCart(${index})">Remove</button>`;
+                cartItems.appendChild(div);
+                total += item.price * item.qty; });
+            cartTotal.textContent = `Total: ₹${total}`;}
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCart();}
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.remove('hide');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.add('hide');
+            }, 3500);}
+        const profileBtn = document.getElementById('profileBtn');
+        const profileMenu = document.getElementById('profileMenu');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const ordersBtn = document.getElementById('ordersBtn');
+        profileBtn.addEventListener('click', () => {
+            profileMenu.style.display = profileMenu.style.display === 'block' ? 'none' : 'block';});
+        window.addEventListener('click', (e) => {
+            if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
+                profileMenu.style.display = 'none';}});
+        function openPayment() {
+            const cartList = document.querySelectorAll('.cart-item');
+            const orderList = document.getElementById('orderList');
+            orderList.innerHTML = '';
+            let total = 0;
+            cartList.forEach(item => {
+                const name = item.querySelector('span')?.innerText || 'Product';
+                const priceMatch = item.innerText.match(/₹(\d+)/);
+                const price = priceMatch ? parseInt(priceMatch[1]) : 0;
+                const img = item.querySelector('img')?.src || 'https://via.placeholder.com/50';
+                total += price;
+                const div = document.createElement('div');
+                div.classList.add('order-item');
+                div.innerHTML = `<img src="${img}"><div>${name}</div><div>₹${price}</div>`;
+                orderList.appendChild(div);});
+            document.getElementById('orderTotal').innerText = `Total: ₹${total}`;
+            document.getElementById('paymentModal').style.display = 'flex';
+            showStep(1);}
+        function showStep(step) {
+            document.querySelectorAll('.payment-step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');}
+        function goToStep2() {
+            showStep(2);}
+        function closePayment() {
+            document.getElementById('paymentModal').style.display = 'none';}
+        function confirmPayment() {
+            const name = document.getElementById('userName').value.trim();
+            const email = document.getElementById('userEmail').value.trim();
+            const phone = document.getElementById('userPhone').value.trim();
+            const address = document.getElementById('userAddress').value.trim();
+            const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value || 'Unknown';
+            if (!name || !email || !phone || !address) {
+                alert('Please fill all your details before confirming payment.');
+                return; }
+            const btn = document.querySelector('#step2 button');
+            btn.innerText = 'Processing...';
+            btn.disabled = true;
+            setTimeout(() => {
+                saveOrder(name, email, paymentMethod);
+                showToast(`🎉 Payment Successful! Thank you, ${name}!`);
+                setTimeout(() => {
+                    showToast(`📧 Confirmation email sent to ${email}`);
+                }, 1200);
+                closePayment();
+                btn.innerText = 'Confirm Payment';
+                btn.disabled = false;
+                triggerNotification();
+            }, 2000);}
+        ordersBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showOrders();
+            profileMenu.style.display = 'none'; });
+        function triggerNotification() {
+            const bell = document.getElementById('notifyBell');
+            if (!bell) return;
+            bell.classList.add('new', 'animate');
+            setTimeout(() => bell.classList.remove('animate'), 1500);
+            setTimeout(() => bell.classList.remove('new'), 4000);}</script>
+    <!-- Image Zoom Popup -->
+    <script>
+        (function() {
+            const popup = document.getElementById('imagePopup');
+            const popupImg = document.getElementById('popupImage');
+            const closeBtn = document.getElementById('closeImageBtn');
+
+            document.addEventListener('click', function(e) {
+                const target = e.target;
+                if (target.matches('.product img, .product-card img, img.product-image')) {
+                    e.preventDefault();
+                    const src = target.src || target.getAttribute('data-src');
+                    if (!src) return;
+                    popupImg.src = src;
+                    popup.classList.add('show');
+                    popup.setAttribute('aria-hidden', 'false');
+                    popup.classList.add('closable');
+                    document.documentElement.style.overflow = 'hidden';
+                    document.body.style.overflow = 'hidden';}});
+            function closeImage() {
+                popup.classList.remove('show');
+                popup.setAttribute('aria-hidden', 'true');
+                popupImg.src = '';
+                popup.classList.remove('closable');
+                document.documentElement.style.overflow = '';
+                document.body.style.overflow = '';}
+            closeBtn.addEventListener('click', closeImage);
+            popup.addEventListener('click', function(e) {
+                if (e.target === popup) closeImage();
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && popup.classList.contains('show')) {
+                    closeImage(); } });})();
+    </script>
+    <!-- Theme Toggle -->
+    <script>
+        function applyTheme(isDark) {
+            if (isDark) {
+                document.body.classList.add('dark-theme');
+                localStorage.setItem('theme', 'dark');
+                document.getElementById('themeToggle').checked = true;
+            } else {
+                document.body.classList.remove('dark-theme');
+                localStorage.setItem('theme', 'light');
+                document.getElementById('themeToggle').checked = false;}}
+        document.addEventListener('DOMContentLoaded', () => {
+            const pref = localStorage.getItem('theme') || 'light';
+            applyTheme(pref === 'dark');
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                toggle.addEventListener('change', (e) => {
+                    applyTheme(e.target.checked); }); }});
+    </script>
+ <!-- Search Functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('searchInput');
+            const searchClearBtn = document.getElementById('searchClearBtn');
+            const searchBtn = document.getElementById('searchBtn');
+            const productCards = document.querySelectorAll('.product');
+            // Live search
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value.toLowerCase().trim();
+                searchClearBtn.classList.toggle('visible', query.length > 0);
+                productCards.forEach(card => {
+                    const title = card.querySelector('h3')?.textContent.toLowerCase() || '';
+                    const description = card.querySelector('p')?.textContent.toLowerCase() || '';
+                    const isMatch = title.includes(query) || description.includes(query);
+                    card.style.display = isMatch ? 'block' : 'none';
+                    if (isMatch) {
+                        card.style.animation = 'fadeIn 0.3s ease-in-out';
+                    }}); }); // Clear button
+            searchClearBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                searchClearBtn.classList.remove('visible');
+                searchInput.dispatchEvent(new Event('input'));
+                searchInput.focus();});
+            // Search button (focuses input)
+            searchBtn.addEventListener('click', () => {
+                searchInput.focus(); }); });
+    </script>
+<script>
+function buyNow(productName, price, imageSrc) {
+  // Convert relative image path to absolute URL
+  const fullImagePath = new URL(imageSrc, window.location.href).href;
+  // Pass all product details as URL parameters
+  const params = new URLSearchParams({
+    product: productName,
+    price: price,
+    image: fullImagePath
+  });
+  // Redirect to payment.html with product details
+  window.location.href = `payment.html?${params.toString()}`;}
+</script>
+<!-- ✅ Firebase Logout Functionality with BG Update -->
+<style>
+  body {
+    background: linear-gradient(135deg, #ffb6b9, #fae3d9, #bbded6, #61c0bf);
+    background-size: 400% 400%;
+    animation: bgShift 12s ease infinite;}
+  @keyframes bgShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }}
+  #logoutBtn {
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;}
+  #logoutBtn:hover {
+    transform: scale(1.08);
+    background: linear-gradient(135deg, #ed1b87, #ff416c);
+    box-shadow: 0 0 20px rgba(244, 62, 21, 0.7);}
+</style>
+<!-- ✅ Firebase Logout + Matching Order Button Styling -->
+<style>
+  body {
+    background: linear-gradient(135deg, #ffe0b2, #ffccbc, #f8bbd0, #d1c4e9);
+    background-size: 400% 400%;
+    animation: bgShift 15s ease infinite;}
+  @keyframes bgShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }}
+  /* 🔸 Common Button Style for Logout and Your Order */
+  #logoutBtn, #orderBtn {
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 0 12px rgba(255, 75, 43, 0.4);}
+  #logoutBtn:hover, #orderBtn:hover {
+    transform: scale(1.08);
+    background: linear-gradient(135deg, #ff4b2b, #ff416c);
+    box-shadow: 0 0 25px rgba(255, 75, 43, 0.8), 0 0 50px rgba(255, 140, 0, 0.6);
+    animation: glowPulse 1.5s infinite alternate;}
+  #logoutBtn:active, #orderBtn:active {
+    transform: scale(0.96);
+    box-shadow: 0 0 15px rgba(255, 69, 0, 0.9);}
+  @keyframes glowPulse {
+    0% { box-shadow: 0 0 10px rgba(255, 69, 0, 0.6); }
+    50% { box-shadow: 0 0 25px rgba(255, 140, 0, 1); }
+    100% { box-shadow: 0 0 10px rgba(255, 69, 0, 0.6); }}
+</style>
+</script>
+<script>
+document.getElementById("ordersBtn").addEventListener("click", function() {
+    window.location.href = "orders.html";
+});
+</script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKuFqq1jYeUon9DgqMnaq6vg1tYDdTnPo",
+    authDomain: "website-9a715.firebaseapp.com",
+    projectId: "website-9a715",
+    storageBucket: "website-9a715.appspot.com",
+    messagingSenderId: "1006565436423",
+    appId: "1:1006565436423:web:a97c2176e5ead19a350ea2",
+    measurementId: "G-TC1052C9MT"
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = "login.html";
+    }
+  });
+  if (!window.logoutBtnInitialized) {
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", async () => {
+        try {
+          await signOut(auth);
+          alert("💅 Logged out successfully!");
+          window.location.href = "login.html";
+        } catch (error) {
+          console.error("Logout Error:", error);
+          alert("Something went wrong while logging out. Please try again.");
+        }
+      }); }window.logoutBtnInitialized = true; }// Prevent redeclaration
+  function goToPayment(product, price, image) {
+    const params = new URLSearchParams({
+      product: product,
+      price: price,
+      image: image
+    });
+    window.location.href = `payment.html?${params.toString()}`;}
+</script>
+</body>
+</html>
