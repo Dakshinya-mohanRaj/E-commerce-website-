@@ -19,7 +19,7 @@
         @keyframes fadeSlideDown{0%{opacity:0;transform:translateY(-40px)}60%{opacity:1;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
         nav{background:rgba(255,255,255,.9);padding:.5rem;display:flex;justify-content:center;align-items:center;gap:1rem;position:relative;z-index:1}
         nav a{color:#ff6b9d;text-decoration:none;font-weight:700;transition:color .3s}
-        nav a:hover{color:#ff8fab}
+        nav a:hover{color:#ff8fab}   
         .dropdown img{width:40px;height:40px;border-radius:50%;cursor:pointer}
         .dropdown div button{background:linear-gradient(135deg,#ff69b4,#e91e63);color:#fff;border:none;padding:.6rem;border-radius:8px;cursor:pointer;margin-bottom:.5rem;width:100%;font-weight:700;font-family:"Poppins",sans-serif;font-size:.95rem;transition:.4s ease-in-out;box-shadow:0 0 15px rgba(255,105,180,.6),0 0 25px rgba(233,30,99,.4);animation:glowPulse 2s infinite alternate}
         .dropdown div button:hover{transform:scale(1.07);box-shadow:0 0 25px rgba(255,105,180,.9),0 0 50px rgba(233,30,99,.7)}
@@ -30,7 +30,7 @@
         .product{background:rgba(255,255,255,.9);border-radius:15px;padding:1.5rem;box-shadow:0 8px 25px rgba(0,0,0,.15);text-align:center;transition:.3s;position:relative;overflow:hidden}
         .product::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,107,157,.1),transparent);transition:.5s}
         .product:hover::before{left:100%}
-        .product:hover{transform:translateY(-10px) rotateX(5deg);box-shadow:0 15px 40px rgba(0,0,0,.2)}
+        .product:hover{transform:translateY(-10px) rotateX(5deg);box-shadow:0 10px 10px rgba(0,0,0,.2)}
         .product img{max-width:100%;height:200px;object-fit:cover;border-radius:10px;margin-bottom:1rem}
         .product h3{color:#ff6b9d;margin:1rem 0 .5rem}
         .product p{color:#666}
@@ -485,7 +485,7 @@ document.getElementById("ordersBtn").addEventListener("click", function() {
   const auth = getAuth(app);
   onAuthStateChanged(auth, (user) => {
     if (!user) {
-      window.location.href = "login.html";
+      window.location.href = "index.html";
     }
   });
   if (!window.logoutBtnInitialized) {
@@ -495,7 +495,7 @@ document.getElementById("ordersBtn").addEventListener("click", function() {
         try {
           await signOut(auth);
           alert("💅 Logged out successfully!");
-          window.location.href = "login.html";
+          window.location.href = "index.html";
         } catch (error) {
           console.error("Logout Error:", error);
           alert("Something went wrong while logging out. Please try again.");
@@ -509,5 +509,6 @@ document.getElementById("ordersBtn").addEventListener("click", function() {
     });
     window.location.href = `payment.html?${params.toString()}`;}
 </script>
+
 </body>
 </html>
