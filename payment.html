@@ -135,9 +135,20 @@ z-index: 999;
 <div class="payment-container">
   <button class="close-btn" onclick="window.location.href='home.html'">×</button>
   <h2>Proceed to Payment</h2>
-  <img id="productImage" src="" alt="Product" />
-  <p id="product"></p>
-  <p id="price"></p>
+
+  <!-- single product display (used when not checking out cart) -->
+  <div id="singleProductDisplay">
+    <img id="productImage" src="" alt="Product" />
+    <p id="product"></p>
+    <p id="price"></p>
+  </div>
+
+  <!-- cart summary display (shown when cart checkout) -->
+  <div id="cartSummary" style="display:none; text-align:left;">
+    <div id="cartItemsList"></div>
+    <p id="cartTotal" style="font-weight:600; margin-top:10px;"></p>
+  </div>
+
   <button class="btn" onclick="openPopup()">Pay Now</button>
 </div>
 
@@ -188,15 +199,30 @@ if (isCart) {
   let total = 0;
   let names = [];
 
+  // build cart summary list
+  const cartItemsList = document.getElementById("cartItemsList");
+  cartItemsList.innerHTML = '';
+
   cart.forEach(item => {
     total += item.price * item.qty;
     names.push(item.name + " x" + item.qty);
+
+    const div = document.createElement('div');
+    div.className = 'summary-item';
+    div.innerHTML = `<img src="${item.image}" alt="" />
+                     <span>${item.name} x${item.qty}</span>
+                     <span style="margin-left:auto;">₹${item.price * item.qty}</span>`;
+    cartItemsList.appendChild(div);
   });
 
   // overwrite values with cart summary
   productName = names.join(", ");
   productPrice = total;
   productImage = "https://cdn-icons-png.flaticon.com/512/263/263142.png";
+
+  // show cart view, hide single-product display
+  document.getElementById('cartSummary').style.display = 'block';
+  document.getElementById('singleProductDisplay').style.display = 'none';
 }
 
 // convert price to number for consistent formatting
