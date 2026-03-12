@@ -171,16 +171,57 @@ z-index: 999;
 
 <script>
 const params = new URLSearchParams(window.location.search);
-const productName = params.get("product");
-const productPrice = params.get("price");
-const productImage = params.get("image");
+const isCart = params.get("cart") === "true";          // boolean flag
+let productName = params.get("product");
+let productPrice = params.get("price");
+let productImage = params.get("image");
 
-document.getElementById("product").textContent = "Product: " + productName;
-document.getElementById("price").textContent = "Price: ₹" + productPrice;
-document.getElementById("productImage").src = productImage;
+// if user landed here with no product and not coming from cart, send them back
+if (!isCart && !productName) {
+  window.location.href = 'home.html';
+}
+
+// CART CHECKOUT
+if (isCart) {
+  const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+
+  let total = 0;
+  let names = [];
+
+  cart.forEach(item => {
+    total += item.price * item.qty;
+    names.push(item.name + " x" + item.qty);
+  });
+
+  // overwrite values with cart summary
+  productName = names.join(", ");
+  productPrice = total;
+  productImage = "https://cdn-icons-png.flaticon.com/512/263/263142.png";
+}
+
+// convert price to number for consistent formatting
+productPrice = Number(productPrice) || 0;
+
+document.getElementById("product").textContent = "Product: " + (productName || "N/A");
+document.getElementById("price").textContent = "Price: ₹" + (productPrice || 0);
+const imgElement = document.getElementById("productImage");
+
+if(productImage && productImage !== "null"){
+  imgElement.src = productImage;
+}else{
+  imgElement.src = "https://cdn-icons-png.flaticon.com/512/263/263142.png"; 
+}
 
 function openPopup() { document.getElementById("overlay").style.display = "flex"; }
-function closePopup() { document.getElementById("overlay").style.display = "none"; }
+function closePopup() {
+  document.getElementById("overlay").style.display = "none";
+  // clear form fields
+  document.getElementById("name").value = '';
+  document.getElementById("address").value = '';
+  document.getElementById("phone").value = '';
+  document.getElementById("paymentMethod").value = '';
+  document.getElementById("methodLogo").style.display = 'none';
+}
 
 function updateLogo() {
   const method = document.getElementById("paymentMethod").value;
@@ -204,11 +245,20 @@ function confirmPayment() {
   const address = document.getElementById("address").value.trim();
   const phone = document.getElementById("phone").value.trim();
   const paymentMethod = document.getElementById("paymentMethod").value;
+  const btn = document.querySelector('.popup .btn');
 
+  // basic validation
   if (!name || !address || !phone || !paymentMethod) {
     alert("Please fill all the fields");
     return;
   }
+  if (!/^[0-9]{10}$/.test(phone)) {
+    alert("Phone number must be 10 digits");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
 
   const order = {
     id: Date.now(),
@@ -226,6 +276,12 @@ function confirmPayment() {
   orders.push(order);
   localStorage.setItem("nailArtOrders", JSON.stringify(orders));
 
+  // if this was a cart checkout, clear the saved cart
+  if (isCart) {
+    localStorage.removeItem('cartItems');
+  }
+
+  closePopup();
   const toast = document.getElementById("toast");
   toast.classList.add("show");
   setTimeout(() => {
