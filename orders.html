@@ -1,97 +1,253 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Orders | NailArt Haven</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-body {
-  font-family: 'Poppins', sans-serif;
-  background: radial-gradient(circle at top left, #ff9a9e, #f341c0, #fcb69f);
-  margin: 0;
-  padding: 20px;
-  min-height: 100vh;
-}
-h1 {
-  text-align: center;
-  color: #ff69b4;
-  margin: 30px 0;
-}
-.order-card {
-  background: rgba(255,255,255,0.97);
-  max-width: 500px;
-  margin: 25px auto;
-  padding: 25px;
-  border-radius: 20px;
-  box-shadow: 0 8px 30px rgba(255,105,180,0.4);
-  text-align: center;
-  animation: fadeInUp 0.8s ease;
-}
-.order-card img {
-  width: 160px;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 5px 20px rgba(255,182,193,0.6);
-}
-.order-card h3 { color: #e91e63; margin: 10px 0; }
-.order-card p { margin: 8px 0; color: #444; }
-.back-btn {
-  display: block;
-  width: 200px;
-  margin: 30px auto;
-  padding: 12px;
-  background: linear-gradient(135deg, #ff9669, #e91e63);
-  color: white;
-  text-align: center;
-  text-decoration: none;
-  border-radius: 12px;
-  font-size: 1.1rem;
-}
-.back-btn:hover { transform: scale(1.05); }
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Orders - Nail Glam</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #ffb6b9, #fae3d9, #bbded6, #61c0bf);
+      background-size: 400% 400%;
+      animation: bgShift 15s ease infinite;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+    }
+    @keyframes bgShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    header {
+      width: 100%;
+      background: linear-gradient(135deg, #ff2bc3, #eb0f42);
+      color: #fff;
+      padding: 1.5rem;
+      font-size: 1.6rem;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    }
+    .content {
+      margin: 2rem auto;
+      width: 90%;
+      max-width: 720px;
+      background: rgba(255,255,255,.3);
+      backdrop-filter: blur(12px);
+      border-radius: 18px;
+      padding: 2rem;
+      box-shadow: 0 8px 30px rgba(255,105,180,.35);
+    }
+    h2 {
+      color: #e91e63;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .order-card {
+      background: rgba(255,255,255,.9);
+      border-radius: 14px;
+      padding: 1.2rem;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,.1);
+      animation: slideUp .6s ease-out forwards;
+    }
+    @keyframes slideUp {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .order-header {
+      font-weight: 700;
+      color: #e91e63;
+      margin-bottom: .8rem;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .product-list {
+      margin-bottom: 0.8rem;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .product-list strong {
+      color: #ff2bc3;
+    }
+    .order-details {
+      font-size: .95rem;
+      color: #555;
+      line-height: 1.6;
+    }
+    .back-btn {
+      margin-top: 1.5rem;
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      border: none;
+      color: #fff;
+      padding: .75rem 1.8rem;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all .3s ease;
+      box-shadow: 0 0 12px rgba(255,75,43,.4);
+    }
+    .back-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 25px rgba(255,75,43,.8);
+    }
+    .empty {
+      text-align: center;
+      font-style: italic;
+      color: #777;
+      margin-top: 1.5rem;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-top: 10px;
+    }
+    .status-pending { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+    .status-shipped { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    .status-delivered { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  </style>
+
 </head>
 <body>
 
-<h1>My Orders</h1>
+ <header>My Order History</header>
 
-<div id="orderList">
-  <!-- Orders will be injected here by JavaScript -->
-</div>
+<section class="content">
+  <h2>Past Orders</h2>
+  <div id="orderList"></div>
+  <button class="back-btn" onclick="window.location.href='home.html'">Back to Home</button>
+</section>
 
-<a href="home.html" class="back-btn">Back to Home</a>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-<script>
-// Load and display all orders
-const orders = JSON.parse(localStorage.getItem("nailArtOrders") || "[]");
-const container = document.getElementById("orderList");
+const firebaseConfig = {
+  apiKey: "AIzaSyCKuFqq1jYeUon9DgqMnaq6vg1tYDdTnPo",
+  authDomain: "website-9a715.firebaseapp.com",
+  projectId: "website-9a715",
+  storageBucket: "website-9a715.firebasestorage.app",
+  messagingSenderId: "1006565436423",
+  appId: "1:1006565436423:web:a97c2176e5ead19a350ea2",
+  measurementId: "G-TC1052C9MT"
+};
 
-if (orders.length === 0) {
-  container.innerHTML = "<p style='text-align:center; font-size:1.3rem; color:#ff69b4;'>No orders yet! Start shopping</p>";
-} else {
-  // Show newest first
-  orders.reverse().forEach(order => {
-    container.innerHTML += `
-      <div class="order-card">
-        <img src="${order.image}" alt="${order.product}">
-        <h3>${order.product}</h3>
-        <p><strong>Price:</strong> ₹${order.price}</p>
-        <p><strong>Name:</strong> ${order.customerName}</p>
-        <p><strong>Phone:</strong> ${order.phone}</p>
-        <p><strong>Address:</strong> ${order.address}</p>
-        <p><strong>Payment:</strong> ${order.paymentMethod === "COD" ? "Cash on Delivery" : order.paymentMethod}</p>
-        <p><small>Ordered on: ${order.orderDate}</small></p>
-      </div>
-    `;
-  });
-}
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const orderList = document.getElementById("orderList");
+
+onAuthStateChanged(auth, async (user) => {
+
+  if (!user) {
+    orderList.innerHTML =
+      '<p class="empty">Please login to view your orders.</p>';
+    return;
+  }
+
+  try {
+
+    const q = query(
+      collection(db, "orders"),
+      where("userId", "==", user.uid)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      orderList.innerHTML =
+        '<p class="empty">No orders placed yet.</p>';
+      return;
+    }
+
+    querySnapshot.forEach((docSnap) => {
+
+      const order = docSnap.data();
+      console.log("Order Data:", order); // Debug line
+
+      const div = document.createElement("div");
+      div.className = "order-card";
+
+      let itemsHTML = "";
+
+      if (Array.isArray(order.items) && order.items.length > 0) {
+
+        itemsHTML = order.items.map(item => {
+
+          const image = item.image || "https://via.placeholder.com/60";
+          const name = item.name || "Product";
+          const price = item.price || 0;
+
+          return `
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+              <img src="${image}" 
+              alt="${name}" 
+              style="width:60px;height:60px;border-radius:8px;object-fit:cover;">
+
+              <div>
+                <strong>${name}</strong><br>
+                ₹${price}
+              </div>
+            </div>
+          `;
+
+        }).join("");
+
+      } else {
+
+        itemsHTML = `<em>No items found</em>`;
+
+      }
+
+
+      const status = order.status || "Pending";
+      const statusClass = `status-${status.toLowerCase()}`;
+
+      div.innerHTML = `
+        <div class="order-header">🛍️ Order Summary</div>
+
+        <div class="order-items">
+          ${itemsHTML}
+        </div>
+
+        <div class="order-details">
+          <b>Date:</b> ${order.date || "N/A"}<br>
+          <b>Total Price:</b> ₹${order.total || 0}<br>
+          <b>Payment:</b> ${(order.paymentMethod || "N/A").toUpperCase()}<br>
+          <div class="status-badge ${statusClass}">${status}</div>
+        </div>
+      `;
+
+      orderList.appendChild(div);
+
+    });
+
+  } catch (error) {
+
+    console.error("Error fetching orders:", error);
+
+    orderList.innerHTML =
+      '<p class="empty">Error loading orders.</p>';
+
+  }
+
+});
 </script>
-
+    
+    
+ 
 </body>
 </html>
