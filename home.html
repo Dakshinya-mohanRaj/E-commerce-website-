@@ -122,8 +122,196 @@
   0% {box-shadow: 0 0 10px rgba(255, 0, 64, 0.6);}
   50% {box-shadow: 0 0 25px rgba(255, 140, 0, 1);}
   100% {box-shadow: 0 0 10px rgba(255, 69, 0, 0.6);}}
+
+/* === Sidebar Cart Styling === */
+.sidebar-cart {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 350px;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    box-shadow: -5px 0 30px rgba(0, 0, 0, 0.2);
+    z-index: 10001;
+    transition: 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+.sidebar-cart.active {
+    right: 0;
+}
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #ff69b4;
+    padding-bottom: 10px;
+}
+.sidebar-header h2 {
+    color: #ff69b4;
+    margin: 0;
+}
+.close-sidebar {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #ff69b4;
+}
+#cart-items {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-top: 20px;
+}
+.cart-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #ffe4f1;
+}
+.cart-item img {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+.cart-item-info {
+    flex-grow: 1;
+    margin-left: 15px;
+}
+.cart-item-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #333;
+}
+.cart-item-price {
+    color: #e91e63;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+.remove-item {
+    background: #ffecf2!important;
+    border: none!important;
+    color: #ff4081!important;
+    padding: 5px 10px!important;
+    border-radius: 6px!important;
+    cursor: pointer;
+    font-size: 0.75rem!important;
+    transition: 0.3s;
+    margin: 0!important;
+}
+.remove-item:hover {
+    background: #ff4081!important;
+    color: white!important;
+}
+.sidebar-footer {
+    padding-top: 20px;
+    border-top: 2px solid #ff69b4;
+}
+.sidebar-footer .total {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #e91e63;
+    text-align: center;
+    margin-bottom: 15px;
+}
+.checkout-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #ff69b4, #e91e63);
+    color: white;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3);
+    transition: 0.3s;
+}
+.checkout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(233, 30, 99, 0.5);
+}
+
+/* === Floating Cart Button === */
+#floatingCartBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #ff69b4, #e91e63);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 1.8rem;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(233, 30, 99, 0.4);
+    z-index: 10000;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#floatingCartBtn:hover {
+    transform: scale(1.1) rotate(10deg);
+}
+#cartCount {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: white;
+    color: #e91e63;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #e91e63;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* === Fly Animation === */
+.fly-item {
+    position: fixed;
+    z-index: 10002;
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 12px;
+    pointer-events: none;
+    transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* === Custom Scrollbar === */
+#cart-items::-webkit-scrollbar {
+    width: 6px;
+}
+#cart-items::-webkit-scrollbar-track {
+    background: #fff0f5;
+}
+#cart-items::-webkit-scrollbar-thumb {
+    background: #ff69b4;
+    border-radius: 10px;
+}
+
+.empty-cart-msg {
+    text-align: center;
+    color: #999;
+    margin-top: 50px;
+    font-style: italic;
+    font-size: 1rem;
+}
 </style>
+
 </head>
+
 <body>
     <!-- Header -->
     <header>
@@ -134,6 +322,7 @@
             <div id="profileMenu" style="display:none;">
                 <p id="userInfo">User</p>
                 <button id="ordersBtn">View Orders</button>
+                <button id="adminBtn" style="display:none; background: linear-gradient(135deg, #607d8b, #455a64);">Admin Panel</button>
                 <button id="logoutBtn">Logout</button>
             </div>
         </div>
@@ -157,37 +346,49 @@
     <div class="container">
         <div class="products">
           <!-- 20 Nail Products -->
-          <div class="product "><img src="p1.jpeg" alt="Base Coat"><h3>Base Coat</h3><p>Strengthening base layer for perfect nails.</p><div class="price">₹399</div><button class="addCartBtn" onclick="addToCart('Base Coat',399,'p1.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Base Coat',399,'p1.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p2.jpeg" alt="Top Coat"><h3>Top Coat</h3><p>Flexible and durable gel for nail sculpting.</p><div class="price">₹799</div><button class="addCartBtn" onclick="addToCart('Poly Gel',799,'p2.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Poly Gel',799,'p2.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p3.jpeg" alt="Press-on Nails"><h3>Press-on Nails</h3><p>Quick and stylish nails for everyday wear.</p><div class="price">₹599</div><button class="addCartBtn" onclick="addToCart('Press-on Nails',599,'p3.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Press-on Nails',599,'p3.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p4.jpeg" alt="Nail Wipes"><h3>Nail Wipes</h3><p>Essential wipes for clean and prepped nails.</p><div class="price">₹149</div><button class="addCartBtn" onclick="addToCart('Nail Wipes',149,'p4.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Nail Wipes',149,'p4.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p5.jpeg" alt="Nail Remover"><h3>Nail Remover</h3><p>Gentle formula to remove polish easily.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Nail Remover',199,'p5.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Nail Remover',199,'p5.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p6.jpeg" alt="Shell Nail Polish"><h3>Shell Nail Polish</h3><p>Shimmering shell effect for a glossy finish.</p><div class="price">₹499</div><button class="addCartBtn" onclick="addToCart('Shell Nail Polish',499,'p6.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Shell Nail Polish',499,'p6.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p7.jpeg" alt="UV Curing Lamp"><h3>UV Curing Lamp</h3><p>Fast curing for gels and poly nails.</p><div class="price">₹1299</div><button class="addCartBtn" onclick="addToCart('UV Curing Lamp',1299,'p7.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('UV Curing Lamp',1299,'p7.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p8.jpeg" alt="Nail Art Brushes"><h3>Nail Art Brushes</h3><p>Precision brushes for creative designs.</p><div class="price">₹299</div><button class="addCartBtn" onclick="addToCart('Nail Art Brushes',299,'p8.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Nail Art Brushes',299,'p8.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p9.jpeg" alt="Glitter Stickers"><h3>Glitter Stickers</h3><p>Add sparkle to nails easily.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Glitter Stickers',199,'p9.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Glitter Stickers',199,'p9.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="P10.jpeg" alt="3D Nail Charms"><h3>3D Nail Charms</h3><p>Dimensional charms for artistic nails.</p><div class="price">₹299</div><button class="addCartBtn" onclick="addToCart('3D Nail Charms',299,'p10.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('3D Nail Charms',299,'p10.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p11.jpeg" alt="Holographic Nail Polish"><h3>Holographic Nail Polish</h3><p>Rainbow shifting colors for nails.</p><div class="price">₹399</div><button class="addCartBtn" onclick="addToCart('Holographic Nail Polish',399,'p11.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Holographic Nail Polish',399,'p11.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p12.jpeg" alt="Milky Manicure Polish"><h3>Milky Manicure Polish</h3><p>Soft white polish for subtle nails.</p><div class="price">₹299</div><button class="addCartBtn" onclick="addToCart('Milky Manicure Polish',299,'p12.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Milky Manicure Polish',299,'p12.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p13.jpeg" alt="French Tip Stickers"><h3>French Tip Stickers</h3><p>Classic French tips made easy.</p><div class="price">₹149</div><button class="addCartBtn" onclick="addToCart('French Tip Stickers',149,'p13.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('French Tip Stickers',149,'p13.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p14.jpeg" alt="Customizable Nail Decals"><h3>Customizable Nail Decals</h3><p>Create your unique nail style.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Customizable Nail Decals',199,'p14.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Customizable Nail Decals',199,'p14.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p15.jpeg" alt="Soft Pastel Gel Polish"><h3>Soft Pastel Gel Polish</h3><p>Long-wear gentle pastel gels.</p><div class="price">₹399</div><button class="addCartBtn" onclick="addToCart('Soft Pastel Gel Polish',399,'p15.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Soft Pastel Gel Polish',399,'p15.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p16.jpeg" alt="Bold Neon Nail Polish"><h3>Bold Neon Nail Polish</h3><p>Bright neon colors for fun nails.</p><div class="price">₹299</div><button class="addCartBtn" onclick="addToCart('Bold Neon Nail Polish',299,'p16.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Bold Neon Nail Polish',299,'p16.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p17.jpeg" alt="Matte Rose Nail Polish"><h3>Matte Rose Nail Polish</h3><p>Velvet matte rose pink shade.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Matte Rose Nail Polish',199,'p17.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Matte Rose Nail Polish',199,'p17.html')">Buy Now</button></div>
-          <div class="product"><img src="p18.jpeg" alt="Pastel Lavender Nail Polish"><h3>Pastel Lavender Nail Polish</h3><p>Soft pastel lavender with creamy texture.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Pastel Lavender Nail Polish',199,'p18.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Pastel Lavender Nail Polish',199,'p18.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p19.jpeg" alt="Chrome Mirror Nail Polish"><h3>Chrome Mirror Nail Polish</h3><p>Metallic mirror silver finish for trendy nails.</p><div class="price">₹249</div><button class="addCartBtn" onclick="addToCart('Chrome Mirror Nail Polish',249,'p19.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Chrome Mirror Nail Polish',249,'p19.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p20.jpg" alt="Overnight Repair Treatment"><h3>Overnight Repair Treatment</h3><p>Softens and repairs nails overnight.</p><div class="price">₹399</div><button class="addCartBtn" onclick="addToCart('Overnight Repair Treatment',399,'p20.jpg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Overnight Repair Treatment',399,'p20.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p21.jpeg" alt="Healthy Glow Duo"><h3>Healthy Glow Duo</h3><p>Set for natural shine and strength.</p><div class="price">₹499</div><button class="addCartBtn" onclick="addToCart('Healthy Glow Duo',499,'p21.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Healthy Glow Duo',499,'p21.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p22.jpeg" alt="Almond Nail Tips"><h3>Almond Nail Tips</h3><p>Sleek almond-shaped extensions.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Almond Nail Tips',199,'p22.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Almond Nail Tips',199,'p22.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p23.jpeg" alt="Red Ruby Gel Polish"><h3>Red Ruby Gel Polish</h3><p>Deep glossy red for gel-style shine.</p><div class="price">₹249</div><button class="addCartBtn" onclick="addToCart('Red Ruby Gel Polish',249,'p23.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Red Ruby Gel Polish',249,'p23.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p24.jpeg" alt="Pearlized Shell Nail Polish"><h3>Pearlized Shell Nail Polish</h3><p>Soft pearl finish for nails.</p><div class="price">₹200</div><button class="addCartBtn" onclick="addToCart('Pearlized Shell Nail Polish',200,'p24.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Pearlized Shell Nail Polish',200,'p24.jpeg')">Buy Now</button></div>
-          <div class="product"><img src="p25.jpeg" alt="Iridescent Shell Nail Polish"><h3>Iridescent Shell Nail Polish</h3><p>Color-shifting nail polish.</p><div class="price">₹249</div><button class="addCartBtn" onclick="addToCart('Iridescent Shell Nail Polish',249,'p25.jpeg')">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Iridescent Shell Nail Polish',249,'p25.jpeg')">Buy Now</button></div>
+          <div class="product "><img src="p1.jpeg" alt="Base Coat"><h3>Base Coat</h3><p>Strengthening base layer for perfect nails.</p><div class="price">₹399</div><button class="addCartBtn" onclick="addToCart('Base Coat',399,'p1.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Base Coat',399,'p1.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p2.jpeg" alt="Top Coat"><h3>Top Coat</h3><p>Flexible and durable gel for nail sculpting.</p><div class="price">₹799</div><button class="addCartBtn" onclick="addToCart('Poly Gel',799,'p2.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Poly Gel',799,'p2.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p3.jpeg" alt="Press-on Nails"><h3>Press-on Nails</h3><p>Quick and stylish nails for everyday wear.</p><div class="price">₹599</div><button class="addCartBtn" onclick="addToCart('Press-on Nails',599,'p3.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Press-on Nails',599,'p3.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p4.jpeg" alt="Nail Wipes"><h3>Nail Wipes</h3><p>Essential wipes for clean and prepped nails.</p><div class="price">₹149</div><button class="addCartBtn" onclick="addToCart('Nail Wipes',149,'p4.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Nail Wipes',149,'p4.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p5.jpeg" alt="Nail Remover"><h3>Nail Remover</h3><p>Gentle formula to remove polish easily.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Nail Remover',199,'p5.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Nail Remover',199,'p5.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p6.jpeg" alt="Shell Nail Polish"><h3>Shell Nail Polish</h3><p>Shimmering shell effect for a glossy finish.</p><div class="price">₹499</div><button class="addCartBtn" onclick="addToCart('Shell Nail Polish',499,'p6.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Shell Nail Polish',499,'p6.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p7.jpeg" alt="UV Curing Lamp"><h3>UV Curing Lamp</h3><p>Fast curing for gels and poly nails.</p><div class="price">₹1299</div><button class="addCartBtn" onclick="addToCart('UV Curing Lamp',1299,'p7.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('UV Curing Lamp',1299,'p7.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p8.jpeg" alt="Nail Art Brushes"><h3>Nail Art Brushes</h3><p>Precision brushes for creative designs.</p><div class="price">₹299</div><button class="addCartBtn" onclick="addToCart('Nail Art Brushes',299,'p8.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Nail Art Brushes',299,'p8.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p9.jpeg" alt="Glitter Stickers"><h3>Glitter Stickers</h3><p>Add sparkle to nails easily.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Glitter Stickers',199,'p9.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Glitter Stickers',199,'p9.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="P10.jpeg" alt="3D Nail Charms"><h3>3D Nail Charms</h3><p>Dimensional charms for artistic nails.</p><div class="price">₹299</div><button class="addCartBtn" onclick="addToCart('3D Nail Charms',299,'p10.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('3D Nail Charms',299,'p10.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p11.jpeg" alt="Holographic Nail Polish"><h3>Holographic Nail Polish</h3><p>Rainbow shifting colors for nails.</p><div class="price">₹399</div><button class="addCartBtn" onclick="addToCart('Holographic Nail Polish',399,'p11.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Holographic Nail Polish',399,'p11.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p12.jpeg" alt="Milky Manicure Polish"><h3>Milky Manicure Polish</h3><p>Soft white polish for subtle nails.</p><div class="price">₹299</div><button class="addCartBtn" onclick="addToCart('Milky Manicure Polish',299,'p12.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Milky Manicure Polish',299,'p12.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p13.jpeg" alt="French Tip Stickers"><h3>French Tip Stickers</h3><p>Classic French tips made easy.</p><div class="price">₹149</div><button class="addCartBtn" onclick="addToCart('French Tip Stickers',149,'p13.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('French Tip Stickers',149,'p13.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p14.jpeg" alt="Customizable Nail Decals"><h3>Customizable Nail Decals</h3><p>Create your unique nail style.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Customizable Nail Decals',199,'p14.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Customizable Nail Decals',199,'p14.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p15.jpeg" alt="Soft Pastel Gel Polish"><h3>Soft Pastel Gel Polish</h3><p>Long-wear gentle pastel gels.</p><div class="price">₹399</div><button class="addCartBtn" onclick="addToCart('Soft Pastel Gel Polish',399,'p15.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Soft Pastel Gel Polish',399,'p15.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p16.jpeg" alt="Bold Neon Nail Polish"><h3>Bold Neon Nail Polish</h3><p>Bright neon colors for fun nails.</p><div class="price">₹299</div><button class="addCartBtn" onclick="addToCart('Bold Neon Nail Polish',299,'p16.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Bold Neon Nail Polish',299,'p16.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p17.jpeg" alt="Matte Rose Nail Polish"><h3>Matte Rose Nail Polish</h3><p>Velvet matte rose pink shade.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Matte Rose Nail Polish',199,'p17.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Matte Rose Nail Polish',199,'p17.html')">Buy Now</button></div>
+          <div class="product"><img src="p18.jpeg" alt="Pastel Lavender Nail Polish"><h3>Pastel Lavender Nail Polish</h3><p>Soft pastel lavender with creamy texture.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Pastel Lavender Nail Polish',199,'p18.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Pastel Lavender Nail Polish',199,'p18.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p19.jpeg" alt="Chrome Mirror Nail Polish"><h3>Chrome Mirror Nail Polish</h3><p>Metallic mirror silver finish for trendy nails.</p><div class="price">₹249</div><button class="addCartBtn" onclick="addToCart('Chrome Mirror Nail Polish',249,'p19.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Chrome Mirror Nail Polish',249,'p19.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p20.jpg" alt="Overnight Repair Treatment"><h3>Overnight Repair Treatment</h3><p>Softens and repairs nails overnight.</p><div class="price">₹399</div><button class="addCartBtn" onclick="addToCart('Overnight Repair Treatment',399,'p20.jpg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Overnight Repair Treatment',399,'p20.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p21.jpeg" alt="Healthy Glow Duo"><h3>Healthy Glow Duo</h3><p>Set for natural shine and strength.</p><div class="price">₹499</div><button class="addCartBtn" onclick="addToCart('Healthy Glow Duo',499,'p21.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Healthy Glow Duo',499,'p21.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p22.jpeg" alt="Almond Nail Tips"><h3>Almond Nail Tips</h3><p>Sleek almond-shaped extensions.</p><div class="price">₹199</div><button class="addCartBtn" onclick="addToCart('Almond Nail Tips',199,'p22.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Almond Nail Tips',199,'p22.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p23.jpeg" alt="Red Ruby Gel Polish"><h3>Red Ruby Gel Polish</h3><p>Deep glossy red for gel-style shine.</p><div class="price">₹249</div><button class="addCartBtn" onclick="addToCart('Red Ruby Gel Polish',249,'p23.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Red Ruby Gel Polish',249,'p23.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p24.jpeg" alt="Pearlized Shell Nail Polish"><h3>Pearlized Shell Nail Polish</h3><p>Soft pearl finish for nails.</p><div class="price">₹200</div><button class="addCartBtn" onclick="addToCart('Pearlized Shell Nail Polish',200,'p24.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Pearlized Shell Nail Polish',200,'p24.jpeg')">Buy Now</button></div>
+          <div class="product"><img src="p25.jpeg" alt="Iridescent Shell Nail Polish"><h3>Iridescent Shell Nail Polish</h3><p>Color-shifting nail polish.</p><div class="price">₹249</div><button class="addCartBtn" onclick="addToCart('Iridescent Shell Nail Polish',249,'p25.jpeg', event)">Add to Cart</button><button class="buyNowBtn" onclick="buyNow('Iridescent Shell Nail Polish',249,'p25.jpeg')">Buy Now</button></div>
         </div>
-        <section class="cart">
-          <h2>Shopping Cart</h2>
-          <div id="cart-items"></div>
-          <div class="total" id="cart-total">Total: ₹0</div>
-          <button onclick="checkout()">Checkout</button>
+        <!-- Floating Cart Button -->
+        <div id="floatingCartBtn" onclick="toggleSidebar()">
+            <span id="cartCount">0</span>
+            🛒
+        </div>
+
+        <!-- Sidebar Cart -->
+        <section id="sidebarCart" class="sidebar-cart">
+            <div class="sidebar-header">
+                <h2>Shopping Cart</h2>
+                <button class="close-sidebar" onclick="toggleSidebar()">✖</button>
+            </div>
+            <div id="cart-items"></div>
+            <div class="sidebar-footer">
+                <div class="total" id="cart-total">Total: ₹0</div>
+                <button class="checkout-btn" onclick="checkout()">Checkout</button>
+            </div>
         </section>
       </div>
     <!-- Image Zoom Popup -->
@@ -220,7 +421,7 @@
         // populate cart display on initial load
         document.addEventListener('DOMContentLoaded', updateCart);
         
-        function addToCart(name, price, image) {
+        function addToCart(name, price, image, event) {
             const existing = cart.find(item => item.name === name);
             if (existing) {
                 existing.qty += 1;
@@ -228,25 +429,82 @@
                 cart.push({ name, price, qty: 1, image });
             }
             updateCart();
+            
+            // Fly animation
+            if (event) {
+                const btn = event.target;
+                const productImg = btn.closest('.product').querySelector('img');
+                flyToCart(productImg);
+            }
+
             showToast(`${name} added to cart!`);
             saveCart();
+        }
+        
+        function flyToCart(imgElement) {
+            const cartBtn = document.getElementById('floatingCartBtn');
+            const clone = imgElement.cloneNode(true);
+            const rect = imgElement.getBoundingClientRect();
+            const cartRect = cartBtn.getBoundingClientRect();
+
+            clone.classList.add('fly-item');
+            clone.style.top = rect.top + 'px';
+            clone.style.left = rect.left + 'px';
+            clone.style.width = rect.width + 'px';
+            clone.style.height = rect.height + 'px';
+            
+            document.body.appendChild(clone);
+
+            setTimeout(() => {
+                clone.style.top = cartRect.top + 'px';
+                clone.style.left = cartRect.left + 'px';
+                clone.style.width = '20px';
+                clone.style.height = '20px';
+                clone.style.opacity = '0';
+            }, 10);
+
+            setTimeout(() => {
+                clone.remove();
+                cartBtn.style.transform = 'scale(1.2)';
+                setTimeout(() => cartBtn.style.transform = 'scale(1)', 200);
+            }, 800);
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebarCart').classList.toggle('active');
         }
         
         function updateCart() {
             const cartItems = document.getElementById('cart-items');
             const cartTotal = document.getElementById('cart-total');
+            const cartCount = document.getElementById('cartCount');
+            
             cartItems.innerHTML = '';
             let total = 0;
-            cart.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = 'cart-item';
-                div.innerHTML = `<img src="${item.image}" style="width:30px;height:30px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:8px;" />
-                                <span>${item.name} x${item.qty} - ₹${item.price * item.qty}</span>
-                                <button onclick=\"removeFromCart(${index})\">Remove</button>`;
-                cartItems.appendChild(div);
-                total += item.price * item.qty;
-            });
+            let count = 0;
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<div class="empty-cart-msg">Your cart is empty 🌸</div>';
+            } else {
+                cart.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'cart-item';
+                    div.innerHTML = `
+                        <img src="${item.image}" />
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">₹${item.price} x ${item.qty}</div>
+                        </div>
+                        <button class="remove-item" onclick="removeFromCart(${index})">Remove</button>
+                    `;
+                    cartItems.appendChild(div);
+                    total += item.price * item.qty;
+                    count += item.qty;
+                });
+            }
+            
             cartTotal.textContent = `Total: ₹${total}`;
+            cartCount.textContent = count;
             saveCart();
         }
         
@@ -501,6 +759,9 @@ function buyNow(productName, price, imageSrc) {
 document.getElementById("ordersBtn").addEventListener("click", function() {
     window.location.href = "orders.html";
 });
+document.getElementById("adminBtn").addEventListener("click", function() {
+    window.location.href = "admin.html";
+});
 </script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -519,6 +780,13 @@ document.getElementById("ordersBtn").addEventListener("click", function() {
   onAuthStateChanged(auth, (user) => {
     if (!user) {
       window.location.href = "index.html";
+    } else {
+      // ✅ ADMIN EMAIL CHECK
+      const ADMIN_EMAIL = "admin@gmail.com";
+      document.getElementById("userInfo").textContent = user.email;
+      if (user.email === ADMIN_EMAIL) {
+        document.getElementById("adminBtn").style.display = "block";
+      }
     }
   });
   if (!window.logoutBtnInitialized) {
