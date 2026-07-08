@@ -201,7 +201,13 @@
         await signInWithEmailAndPassword(auth, email, password);
         errorMsg.textContent = "";
         showToast('💅 Successfully Logged In!');
-        setTimeout(() => window.location.href = 'home.html', 2000);
+        setTimeout(() => {
+          if (email === "admin@gmail.com") {
+            window.location.href = 'admin.html';
+          } else {
+            window.location.href = 'home.html';
+          }
+        }, 2000);
       } catch (error) {
         errorMsg.textContent = "⚠️ " + error.message;
       }
