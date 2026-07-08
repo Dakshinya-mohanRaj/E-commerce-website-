@@ -180,141 +180,150 @@ z-index: 999;
 
 <div id="toast" class="toast">Payment Successful!</div>
 
-<script>
-const params = new URLSearchParams(window.location.search);
-const isCart = params.get("cart") === "true";          // boolean flag
-let productName = params.get("product");
-let productPrice = params.get("price");
-let productImage = params.get("image");
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// if user landed here with no product and not coming from cart, send them back
-if (!isCart && !productName) {
-  window.location.href = 'home.html';
-}
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKuFqq1jYeUon9DgqMnaq6vg1tYDdTnPo",
+    authDomain: "website-9a715.firebaseapp.com",
+    projectId: "website-9a715",
+    storageBucket: "website-9a715.firebasestorage.app",
+    messagingSenderId: "1006565436423",
+    appId: "1:1006565436423:web:a97c2176e5ead19a350ea2",
+    measurementId: "G-TC1052C9MT"
+  };
 
-// CART CHECKOUT
-if (isCart) {
-  const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-  let total = 0;
-  let names = [];
-
-  // build cart summary list
-  const cartItemsList = document.getElementById("cartItemsList");
-  cartItemsList.innerHTML = '';
-
-  cart.forEach(item => {
-    total += item.price * item.qty;
-    names.push(item.name + " x" + item.qty);
-
-    const div = document.createElement('div');
-    div.className = 'summary-item';
-    div.innerHTML = `<img src="${item.image}" alt="" />
-                     <span>${item.name} x${item.qty}</span>
-                     <span style="margin-left:auto;">₹${item.price * item.qty}</span>`;
-    cartItemsList.appendChild(div);
+  let currentUser = null;
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      currentUser = user;
+    } else {
+      window.location.href = 'index.html';
+    }
   });
 
-  // overwrite values with cart summary
-  productName = names.join(", ");
-  productPrice = total;
-  productImage = "https://cdn-icons-png.flaticon.com/512/263/263142.png";
+  const params = new URLSearchParams(window.location.search);
+  const isCart = params.get("cart") === "true";
+  let productName = params.get("product");
+  let productPrice = params.get("price");
+  let productImage = params.get("image");
+  let itemsToSave = [];
 
-  // show cart view, hide single-product display
-  document.getElementById('cartSummary').style.display = 'block';
-  document.getElementById('singleProductDisplay').style.display = 'none';
-}
-
-// convert price to number for consistent formatting
-productPrice = Number(productPrice) || 0;
-
-document.getElementById("product").textContent = "Product: " + (productName || "N/A");
-document.getElementById("price").textContent = "Price: ₹" + (productPrice || 0);
-const imgElement = document.getElementById("productImage");
-
-if(productImage && productImage !== "null"){
-  imgElement.src = productImage;
-}else{
-  imgElement.src = "https://cdn-icons-png.flaticon.com/512/263/263142.png"; 
-}
-
-function openPopup() { document.getElementById("overlay").style.display = "flex"; }
-function closePopup() {
-  document.getElementById("overlay").style.display = "none";
-  // clear form fields
-  document.getElementById("name").value = '';
-  document.getElementById("address").value = '';
-  document.getElementById("phone").value = '';
-  document.getElementById("paymentMethod").value = '';
-  document.getElementById("methodLogo").style.display = 'none';
-}
-
-function updateLogo() {
-  const method = document.getElementById("paymentMethod").value;
-  const logo = document.getElementById("methodLogo");
-  const logos = {
-    GPay: "https://i.pinimg.com/736x/60/5a/bd/605abdb7af3405c6b20a426b1e128322.jpg",
-    PhonePe: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/phonepe-icon.png",
-    Paytm: "data:image/png;base64,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"
-  };
-  if (logos[method]) {
-    logo.src = logos[method];
-    logo.style.display = "block";
-  } else {
-    logo.style.display = "none";
-  }
-}
-
-// Save order + show success
-function confirmPayment() {
-  const name = document.getElementById("name").value.trim();
-  const address = document.getElementById("address").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const paymentMethod = document.getElementById("paymentMethod").value;
-  const btn = document.querySelector('.popup .btn');
-
-  // basic validation
-  if (!name || !address || !phone || !paymentMethod) {
-    alert("Please fill all the fields");
-    return;
-  }
-  if (!/^[0-9]{10}$/.test(phone)) {
-    alert("Phone number must be 10 digits");
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Processing...';
-
-  const order = {
-    id: Date.now(),
-    product: productName,
-    price: productPrice,
-    image: productImage,
-    customerName: name,
-    address: address,
-    phone: phone,
-    paymentMethod: paymentMethod,
-    orderDate: new Date().toLocaleString('en-IN')
-  };
-
-  let orders = JSON.parse(localStorage.getItem("nailArtOrders") || "[]");
-  orders.push(order);
-  localStorage.setItem("nailArtOrders", JSON.stringify(orders));
-
-  // if this was a cart checkout, clear the saved cart
   if (isCart) {
-    localStorage.removeItem('cartItems');
+    const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+    let total = 0;
+    const cartItemsList = document.getElementById("cartItemsList");
+    cartItemsList.innerHTML = '';
+
+    cart.forEach(item => {
+      const price = Number(item.price) || 0;
+      const qty = Number(item.qty) || 1;
+      total += price * qty;
+      itemsToSave.push({ name: item.name, price: price, qty: qty, image: item.image || "" });
+
+      const div = document.createElement('div');
+      div.className = 'summary-item';
+      div.style.display = 'flex';
+      div.style.alignItems = 'center';
+      div.style.marginBottom = '10px';
+      div.innerHTML = `<img src="${item.image || ""}" style="width:40px;height:40px;border-radius:5px;margin-right:10px;" />
+                       <span style="font-size:0.9rem;">${item.name} x${item.qty}</span>
+                       <span style="margin-left:auto;font-weight:600;">₹${price * qty}</span>`;
+      cartItemsList.appendChild(div);
+    });
+
+    productPrice = total;
+    document.getElementById('cartTotal').textContent = `Total Payable: ₹${total}`;
+    document.getElementById('cartSummary').style.display = 'block';
+    document.getElementById('singleProductDisplay').style.display = 'none';
+  } else {
+    const price = Number(productPrice) || 0;
+    itemsToSave.push({ name: productName, price: price, qty: 1, image: productImage || "" });
+    document.getElementById("product").textContent = "Product: " + (productName || "N/A");
+    document.getElementById("price").textContent = "Price: ₹" + (price || 0);
+    const imgElement = document.getElementById("productImage");
+    imgElement.src = productImage || "https://cdn-icons-png.flaticon.com/512/263/263142.png";
+    productPrice = price; // Ensure it's a number
   }
 
-  closePopup();
-  const toast = document.getElementById("toast");
-  toast.classList.add("show");
-  setTimeout(() => {
-    toast.classList.remove("show");
-    window.location.href = "orders.html";
-  }, 2000);
-}
+  window.confirmPayment = async function() {
+    const name = document.getElementById("name").value.trim();
+    const address = document.getElementById("address").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const paymentMethod = document.getElementById("paymentMethod").value;
+    const btn = document.querySelector('.popup .btn');
+
+    if (!name || !address || !phone || !paymentMethod) {
+      alert("Please fill all the fields");
+      return;
+    }
+    if (!/^[0-9]{10}$/.test(phone)) {
+      alert("Phone number must be 10 digits");
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Processing...';
+
+    try {
+      const orderData = {
+        userId: currentUser ? currentUser.uid : "Guest",
+        customerName: name,
+        address: address,
+        phone: phone,
+        paymentMethod: paymentMethod,
+        items: itemsToSave,
+        total: productPrice,
+        date: new Date().toLocaleString('en-IN'),
+        status: "Pending"
+      };
+
+      await addDoc(collection(db, "orders"), orderData);
+
+      if (isCart) {
+        localStorage.removeItem('cartItems');
+      }
+
+      document.getElementById("overlay").style.display = "none";
+      const toast = document.getElementById("toast");
+      toast.textContent = "🎉 Order Placed Successfully!";
+      toast.classList.add("show");
+
+      setTimeout(() => {
+        window.location.href = "orders.html";
+      }, 2500);
+
+    } catch (error) {
+      console.error("Error saving order:", error);
+      alert("Something went wrong. Error: " + error.message);
+      btn.disabled = false;
+      btn.textContent = 'Confirm Payment';
+    }
+  };
+
+  window.openPopup = () => { document.getElementById("overlay").style.display = "flex"; };
+  window.closePopup = () => { document.getElementById("overlay").style.display = "none"; };
+  window.updateLogo = () => {
+    const method = document.getElementById("paymentMethod").value;
+    const logo = document.getElementById("methodLogo");
+    const logos = {
+      GPay: "https://i.pinimg.com/736x/60/5a/bd/605abdb7af3405c6b20a426b1e128322.jpg",
+      PhonePe: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/phonepe-icon.png",
+      Paytm: "https://upload.wikimedia.org/wikipedia/commons/4/42/Paytm_logo.png"
+    };
+    if (logos[method]) {
+      logo.src = logos[method];
+      logo.style.display = "block";
+    } else {
+      logo.style.display = "none";
+    }
+  };
 </script>
 </body>
 </html>
