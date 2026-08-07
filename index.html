@@ -3,14 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nail Glam 💅 | Login & Signup</title>
+  <meta name="description" content="Access your Nail Glam account. Explore and shop luxury nail products." />
+  <title>Nail Glam 💅 | Access Portal</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
     body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #ffb6c1, #ff69b4, #e91e63);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -19,11 +16,8 @@
     }
 
     .container {
-      background: white;
       width: 90%;
-      max-width: 400px;
-      border-radius: 20px;
-      box-shadow: 0 10px 40px rgba(255, 105, 180, 0.5);
+      max-width: 420px;
       overflow: hidden;
       position: relative;
     }
@@ -31,18 +25,18 @@
     .form-container {
       display: flex;
       width: 200%;
-      transition: transform 0.7s ease-in-out;
+      transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
     }
 
     form {
       flex: 1;
-      padding: 40px;
+      padding: 40px 30px;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: stretch;
       justify-content: center;
       opacity: 0;
-      transition: opacity 0.5s ease;
+      transition: opacity 0.4s ease;
     }
 
     form.active {
@@ -50,127 +44,106 @@
     }
 
     h2 {
-      color: #ff69b4;
-      margin-bottom: 20px;
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 1.8rem;
+      text-shadow: 0 2px 10px var(--primary-glow);
     }
 
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: 2px solid #ffc0cb;
-      border-radius: 10px;
-      font-size: 1rem;
-      outline: none;
-      transition: 0.3s;
-    }
-
-    input:focus {
-      border-color: #e584b4;
-      box-shadow: 0 0 10px rgba(255, 182, 193, 0.6);
-    }
-
-    button {
-      background: linear-gradient(135deg, #ff69b4, #e91e63);
-      color: white;
-      border: none;
-      padding: 12px 30px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: bold;
+    .error-msg {
+      color: #ff4d4d;
+      font-size: 0.85rem;
       margin-top: 10px;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 20px rgba(255, 105, 180, 0.4);
+      text-align: center;
+      font-weight: 500;
     }
 
-    button:hover {
-      background: linear-gradient(135deg, #ff80bf, #ff4da6);
-      color: #fff;
-      box-shadow: 0 0 15px rgba(255, 182, 193, 0.8);
-      transform: scale(1.05);
-      background: linear-gradient(135deg, #e43b95, #ff1493);
-    }
-
-    .toggle-btn {
+    .toggle-link {
       background: none;
       border: none;
-      color: #e91e63;
+      color: var(--primary);
       cursor: pointer;
-      font-weight: bold;
-      margin-top: 10px;
+      font-weight: 600;
+      margin-top: 20px;
+      text-align: center;
+      font-family: var(--font-body);
+      transition: color 0.3s;
+    }
+    .toggle-link:hover {
+      color: var(--secondary);
       text-decoration: underline;
     }
 
     .slide {
       transform: translateX(-50%);
     }
-
-    .error {
-      color: red;
-      font-size: 0.9rem;
-      margin-top: 5px;
-    }
-  
-.toast {
-  position: fixed;
-  left: 50%;
-  bottom: 40px;
-  transform: translateX(-50%) translateY(60px) scale(0.8);
-  background: linear-gradient(90deg, #ff69b4, #ff9a9e, #fcb69f, #ff69b4);
-  background-size: 300% 300%;
-  animation: shimmer 2s linear infinite;
-  color: white;
-  padding: 16px 28px;
-  border-radius: 16px;
-  font-size: 1rem;
-  font-weight: 500;
-  font-family: "Poppins", sans-serif;
-  box-shadow: 0 0 25px rgba(255, 105, 180, 0.5);
-  opacity: 0;
-  z-index: 999;
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-@keyframes shimmer {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-.toast.hide { opacity: 0; transform: translateX(-50%) translateY(60px) scale(0.8); }
-
-</style>
+  </style>
 </head>
 <body>
 
-  <div class="container">
+  <!-- Floating Bubbles Background -->
+  <div id="bubbleContainer">
+    <div class="bubble small pink"></div>
+    <div class="bubble medium purple"></div>
+    <div class="bubble large blue"></div>
+    <div class="bubble small purple"></div>
+    <div class="bubble medium pink"></div>
+  </div>
+
+  <div class="container card-glass">
     <div class="form-container" id="formContainer">
       
       <!-- LOGIN FORM -->
       <form id="loginForm" class="active">
         <h2>Welcome Back 💖</h2>
-        <input type="email" id="loginEmail" placeholder="Email" required>
-        <input type="password" id="loginPassword" placeholder="Password" required>
-        <button type="button" id="loginBtn">Login</button>
-        <p class="error" id="loginError"></p>
-        <button class="toggle-btn" id="toSignup">Create an Account →</button>
+        
+        <div class="form-group">
+          <label for="loginEmail">Email Address</label>
+          <input type="email" id="loginEmail" class="form-control" placeholder="name@domain.com" autocomplete="email" required />
+        </div>
+        
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" autocomplete="current-password" required />
+        </div>
+        
+        <button type="button" id="loginBtn" class="btn btn-primary">Login 💅</button>
+        <p class="error-msg" id="loginError"></p>
+        
+        <button type="button" class="toggle-link" id="toSignup">Create an Account →</button>
       </form>
 
       <!-- SIGNUP FORM -->
       <form id="signupForm">
         <h2>Create Account 💅</h2>
-        <input type="text" id="signupName" placeholder="Full Name" required>
-        <input type="email" id="signupEmail" placeholder="Email" required>
-        <input type="password" id="signupPassword" placeholder="Password" required>
-        <button type="button" id="signupBtn">Sign Up</button>
-        <p class="error" id="signupError"></p>
-        <button class="toggle-btn" id="toLogin">← Back to Login</button>
+        
+        <div class="form-group">
+          <label for="signupName">Full Name</label>
+          <input type="text" id="signupName" class="form-control" placeholder="Jane Doe" autocomplete="name" required />
+        </div>
+        
+        <div class="form-group">
+          <label for="signupEmail">Email Address</label>
+          <input type="email" id="signupEmail" class="form-control" placeholder="name@domain.com" autocomplete="email" required />
+        </div>
+        
+        <div class="form-group">
+          <label for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" class="form-control" placeholder="••••••••" autocomplete="new-password" required />
+        </div>
+        
+        <button type="button" id="signupBtn" class="btn btn-primary">Sign Up 🌸</button>
+        <p class="error-msg" id="signupError"></p>
+        
+        <button type="button" class="toggle-link" id="toLogin">← Back to Login</button>
       </form>
 
     </div>
   </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
 
   <!-- Firebase Scripts -->
   <script type="module">
@@ -193,11 +166,18 @@
     // ===================== LOGIN =====================
     const loginBtn = document.getElementById("loginBtn");
     loginBtn.addEventListener("click", async () => {
-      const email = document.getElementById("loginEmail").value;
+      const email = document.getElementById("loginEmail").value.trim();
       const password = document.getElementById("loginPassword").value;
       const errorMsg = document.getElementById("loginError");
 
+      if (!email || !password) {
+        errorMsg.textContent = "⚠️ Please fill in all fields.";
+        return;
+      }
+
       try {
+        loginBtn.disabled = true;
+        loginBtn.textContent = "Authenticating...";
         await signInWithEmailAndPassword(auth, email, password);
         errorMsg.textContent = "";
         showToast('💅 Successfully Logged In!');
@@ -207,30 +187,63 @@
           } else {
             window.location.href = 'home.html';
           }
-        }, 2000);
+        }, 1500);
       } catch (error) {
-        errorMsg.textContent = "⚠️ " + error.message;
+        loginBtn.disabled = false;
+        loginBtn.textContent = "Login 💅";
+        errorMsg.textContent = "⚠️ " + getFriendlyErrorMessage(error.code);
       }
     });
 
     // ===================== SIGNUP =====================
     const signupBtn = document.getElementById("signupBtn");
     signupBtn.addEventListener("click", async () => {
-      const email = document.getElementById("signupEmail").value;
+      const name = document.getElementById("signupName").value.trim();
+      const email = document.getElementById("signupEmail").value.trim();
       const password = document.getElementById("signupPassword").value;
       const errorMsg = document.getElementById("signupError");
 
+      if (!name || !email || !password) {
+        errorMsg.textContent = "⚠️ Please fill in all fields.";
+        return;
+      }
+
       try {
+        signupBtn.disabled = true;
+        signupBtn.textContent = "Registering...";
         await createUserWithEmailAndPassword(auth, email, password);
         errorMsg.textContent = "";
-        showToast('🌸 Account Created Successfully! Please Log In.');
-        toggleToLogin();
+        showToast('🌸 Account Created Successfully! Logging you in...');
+        setTimeout(async () => {
+          try {
+            await signInWithEmailAndPassword(auth, email, password);
+            window.location.href = 'home.html';
+          } catch {
+            toggleToLogin();
+            signupBtn.disabled = false;
+            signupBtn.textContent = "Sign Up 🌸";
+          }
+        }, 1500);
       } catch (error) {
-        errorMsg.textContent = "⚠️ " + error.message;
+        signupBtn.disabled = false;
+        signupBtn.textContent = "Sign Up 🌸";
+        errorMsg.textContent = "⚠️ " + getFriendlyErrorMessage(error.code);
       }
     });
 
-    // ===================== ENTER KEY FUNCTIONALITY =====================
+    function getFriendlyErrorMessage(code) {
+      switch (code) {
+        case 'auth/invalid-email': return 'Invalid email address.';
+        case 'auth/user-disabled': return 'This account has been disabled.';
+        case 'auth/user-not-found': return 'Account not found. Please sign up.';
+        case 'auth/wrong-password': return 'Incorrect password.';
+        case 'auth/email-already-in-use': return 'Email already registered.';
+        case 'auth/weak-password': return 'Password should be at least 6 characters.';
+        default: return 'Authentication failed. Please try again.';
+      }
+    }
+
+    // ===================== ENTER KEY =====================
     document.getElementById("loginForm").addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
@@ -267,15 +280,18 @@
       const toast = document.getElementById("toast");
       toast.textContent = message;
       toast.classList.add("show");
-      toast.classList.remove("hide");
       setTimeout(() => {
-        toast.classList.add("hide");
         toast.classList.remove("show");
       }, 3000);
     }
-  </script>
 
-  <div id="toast" class="toast">💅 Successfully Logged In!</div>
+    const bubbleContainer = document.getElementById("bubbleContainer");
+    const bubbles = Array.from(bubbleContainer.children);
+    bubbles.forEach(b => {
+      b.style.left = `${Math.random() * 90}%`;
+      b.style.animationDelay = `${Math.random() * 10}s`;
+    });
+  </script>
 
 </body>
 </html>
