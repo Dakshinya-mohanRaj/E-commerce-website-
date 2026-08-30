@@ -9,11 +9,11 @@
   <style>
     /* Checkout Page specific layout */
     .checkout-container {
-      max-width: 1050px;
+      max-width: 1100px;
       margin: 40px auto;
       padding: 0 20px 60px;
       display: grid;
-      grid-template-columns: 1.4fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 30px;
     }
 
@@ -53,15 +53,16 @@
 
     /* Payment Methods Options */
     .payment-options-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
     }
     .pay-option-card {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 20px;
+      min-height: 64px;
+      padding: 14px 16px;
       border: 2px solid var(--border-color);
       border-radius: 12px;
       background: var(--bg-surface-solid);
@@ -71,23 +72,30 @@
     }
     .pay-option-card:hover {
       border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .pay-option-card:active {
+      transform: translateY(0);
     }
     .pay-option-card.active {
       border-color: var(--primary);
       box-shadow: 0 0 10px var(--primary-glow);
+      background: linear-gradient(135deg, hsla(var(--primary-hue), 35%, 52%, 0.08), hsla(24, 35%, 60%, 0.06));
     }
     .pay-option-left {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       font-weight: 600;
+      font-size: 0.95rem;
     }
     .pay-option-left input[type="radio"] {
       accent-color: var(--primary);
       transform: scale(1.2);
+      margin: 0;
     }
     .pay-logo {
-      height: 25px;
+      height: 24px;
       max-width: 60px;
       object-fit: contain;
     }
@@ -198,6 +206,12 @@
       }
       .order-summary-sidebar {
         position: static;
+      }
+    }
+
+    @media(max-width: 480px) {
+      .payment-options-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
