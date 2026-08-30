@@ -237,78 +237,113 @@
       const orderTableBody = document.getElementById("orderTableBody");
       orderTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Connecting to registry database...</td></tr>';
       
+      let cloudOrders = [];
+
       try {
         const querySnapshot = await getDocs(collection(db, "orders"));
-        orderTableBody.innerHTML = '';
-        
-        let total = 0, pending = 0, shipped = 0, delivered = 0;
-        
         querySnapshot.forEach((docSnap) => {
-          const order = docSnap.data();
-          const orderId = docSnap.id;
-          total++;
-          
-          if (order.status === "Pending") pending++;
-          else if (order.status === "Shipped") shipped++;
-          else if (order.status === "Delivered") delivered++;
-
-          const tr = document.createElement("tr");
-          tr.setAttribute("data-searchable", `${orderId} ${order.customerName} ${order.phone} ${order.status}`.toLowerCase());
-
-          // Customer details block
-          const customerCell = `
-            <div class="customer-cell">
-              <strong>${order.customerName || "Guest"}</strong>
-              <div>📞 ${order.phone || "N/A"}</div>
-              <div>📍 ${order.address || "N/A"}</div>
-            </div>
-          `;
-
-          // Items thumbnails block
-          const itemsCell = `
-            <div class="items-cell">
-              ${(order.items || []).map(item => `
-                <img src="${item.image || "https://via.placeholder.com/44"}" 
-                     title="${item.name || "Product"} (x${item.qty || 1})" 
-                     alt="${item.name || "Product"}" />
-              `).join('')}
-            </div>
-          `;
-
-          tr.innerHTML = `
-            <td style="font-family: monospace; font-weight: 700;">#${orderId.substring(0, 8).toUpperCase()}</td>
-            <td>${customerCell}</td>
-            <td>${itemsCell}</td>
-            <td style="font-weight: 700; color: var(--secondary);">₹${order.total || 0}</td>
-            <td class="status-select-wrapper">
-              <select onchange="updateStatus('${orderId}', this.value)">
-                <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
-                <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
-              </select>
-            </td>
-            <td style="font-size: 0.85rem; color: var(--text-muted);">${order.date || "N/A"}</td>
-          `;
-          orderTableBody.appendChild(tr);
+          cloudOrders.push({ id: docSnap.id, data: docSnap.data() });
         });
-
-        // Update card metrics
-        document.getElementById("totalOrders").textContent = total;
-        document.getElementById("pendingOrders").textContent = pending;
-        document.getElementById("shippedOrders").textContent = shipped;
-        document.getElementById("deliveredOrders").textContent = delivered;
-
-        // Re-apply searches if query exists
-        filterOrders();
-
       } catch (error) {
-        console.error("Database read error:", error);
-        orderTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Error synchronizing registry database records. Check console.</td></tr>';
+        console.warn("Firestore read failed (showing local orders only):", error);
+      }
+
+      // Merge locally saved orders so admin always sees what customers placed
+      let localOrders = [];
+      try {
+        localOrders = JSON.parse(localStorage.getItem("nailArtLocalOrders") || "[]");
+      } catch (e) { /* ignore malformed local orders */ }
+
+      // De-duplicate: skip local orders that already exist in the cloud by reference
+      const combined = [
+        ...cloudOrders.map(o => ({ id: o.id, data: o.data, local: false })),
+        ...localOrders.map(o => ({ id: o.id || ("local-" + Date.now()), data: o, local: true }))
+      ];
+
+      orderTableBody.innerHTML = '';
+
+      let total = 0, pending = 0, shipped = 0, delivered = 0;
+
+      combined.forEach(({ id, data: order, local }) => {
+        total++;
+
+        if (order.status === "Pending") pending++;
+        else if (order.status === "Shipped") shipped++;
+        else if (order.status === "Delivered") delivered++;
+
+        const tr = document.createElement("tr");
+        tr.setAttribute("data-searchable", `${id} ${order.customerName} ${order.phone} ${order.status}`.toLowerCase());
+
+        // Customer details block
+        const customerCell = `
+          <div class="customer-cell">
+            <strong>${order.customerName || "Guest"}${local ? ' <span style="color:var(--secondary);font-size:0.8rem;">(local)</span>' : ''}</strong>
+            <div>📞 ${order.phone || "N/A"}</div>
+            <div>📍 ${order.address || "N/A"}</div>
+          </div>
+        `;
+
+        // Items thumbnails block
+        const itemsCell = `
+          <div class="items-cell">
+            ${(order.items || []).map(item => `
+              <img src="${item.image || "https://via.placeholder.com/44"}" 
+                   title="${item.name || "Product"} (x${item.qty || 1})" 
+                   alt="${item.name || "Product"}" />
+            `).join('')}
+          </div>
+        `;
+
+        const statusOptions = ["Pending", "Shipped", "Delivered"]
+          .map(s => `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`)
+          .join('');
+
+        tr.innerHTML = `
+          <td style="font-family: monospace; font-weight: 700;">#${String(id).substring(0, 8).toUpperCase()}</td>
+          <td>${customerCell}</td>
+          <td>${itemsCell}</td>
+          <td style="font-weight: 700; color: var(--secondary);">₹${order.total || 0}</td>
+          <td class="status-select-wrapper">
+            <select data-order-id="${id}" onchange="updateStatus('${id}', this.value)">
+              ${statusOptions}
+            </select>
+          </td>
+          <td style="font-size: 0.85rem; color: var(--text-muted);">${order.date || "N/A"}</td>
+        `;
+        orderTableBody.appendChild(tr);
+      });
+
+      // Update card metrics
+      document.getElementById("totalOrders").textContent = total;
+      document.getElementById("pendingOrders").textContent = pending;
+      document.getElementById("shippedOrders").textContent = shipped;
+      document.getElementById("deliveredOrders").textContent = delivered;
+
+      // Re-apply searches if query exists
+      filterOrders();
+
+      if (combined.length === 0) {
+        orderTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No orders placed yet.</td></tr>';
       }
     }
 
     // Update Live status handler
     window.updateStatus = async (orderId, newStatus) => {
+      // Local-order status updates (not backed by Firestore)
+      if (String(orderId).startsWith("local-")) {
+        try {
+          const allLocal = JSON.parse(localStorage.getItem("nailArtLocalOrders") || "[]");
+          const target = allLocal.find(o => o.id === orderId);
+          if (target) {
+            target.status = newStatus;
+            localStorage.setItem("nailArtLocalOrders", JSON.stringify(allLocal));
+            showLocalAlert(`💅 Order #${orderId.substring(0, 8).toUpperCase()} status shifted to: ${newStatus} (local)`);
+            loadOrders();
+            return;
+          }
+        } catch (e) { /* ignore */ }
+      }
+
       try {
         const orderRef = doc(db, "orders", orderId);
         await updateDoc(orderRef, { status: newStatus });

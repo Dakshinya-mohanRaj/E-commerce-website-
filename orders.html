@@ -160,6 +160,29 @@
       justify-content: center;
       margin-top: 30px;
     }
+
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--bg-surface-solid);
+      color: var(--primary);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-lg);
+      border-radius: 12px;
+      padding: 14px 24px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 9999;
+      text-align: center;
+      max-width: 90vw;
+    }
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
@@ -198,6 +221,8 @@
     </div>
   </main>
 
+  <div id="toast"></div>
+
   <!-- Firebase Scripts -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -220,129 +245,161 @@
 
     const orderList = document.getElementById("orderList");
 
+    // Build an order card DOM element from an order object + id
+    function renderOrderCard(order, orderId) {
+      const card = document.createElement("div");
+      card.className = "order-card card-glass";
+
+      let itemsHTML = "";
+      if (Array.isArray(order.items) && order.items.length > 0) {
+        itemsHTML = order.items.map(item => {
+          const image = item.image || "https://via.placeholder.com/60";
+          const name = item.name || "Product";
+          const price = item.price || 0;
+          const qty = item.qty || 1;
+          return `
+            <div class="ordered-item">
+              <img src="${image}" alt="${name}">
+              <div class="ordered-item-info">
+                <div class="ordered-item-name">${name}</div>
+                <div class="ordered-item-price">Quantity: ${qty} • Price: ₹${price}</div>
+              </div>
+              <div style="font-weight: 700;">₹${price * qty}</div>
+            </div>
+          `;
+        }).join("");
+      } else {
+        itemsHTML = `<div style="font-style: italic; color: var(--text-muted);">No items details found</div>`;
+      }
+
+      const status = order.status || "Pending";
+
+      let step1Active = "active";
+      let step2Active = "";
+      let step3Active = "";
+      let line1Active = "";
+      let line2Active = "";
+
+      if (status === "Shipped") {
+        step2Active = "active";
+        line1Active = "active";
+      } else if (status === "Delivered") {
+        step2Active = "active";
+        step3Active = "active";
+        line1Active = "active";
+        line2Active = "active";
+      }
+
+      card.innerHTML = `
+        <div class="order-card-header">
+          <div class="order-meta-info">
+            <div>Order Ref: <strong>#${(orderId || "").substring(0, 8).toUpperCase()}</strong></div>
+            <div>Placed on: ${order.date || "N/A"}</div>
+          </div>
+          <div style="text-align: right;">
+            <span class="btn btn-secondary" style="font-size: 0.8rem; padding: 4px 10px; pointer-events: none;">${status}</span>
+          </div>
+        </div>
+
+        <!-- Live Tracking Timeline -->
+        <div class="tracking-timeline">
+          <div class="timeline-step ${step1Active}">
+            <span class="step-icon">✔</span>
+            <span class="step-label">Placed</span>
+          </div>
+          <div class="timeline-line ${line1Active}"></div>
+          <div class="timeline-step ${step2Active}">
+            <span class="step-icon">🚚</span>
+            <span class="step-label">Shipped</span>
+          </div>
+          <div class="timeline-line ${line2Active}"></div>
+          <div class="timeline-step ${step3Active}">
+            <span class="step-icon">🎁</span>
+            <span class="step-label">Delivered</span>
+          </div>
+        </div>
+
+        <!-- Items list -->
+        <div class="order-items-list">
+          ${itemsHTML}
+        </div>
+
+        <!-- Footer Details -->
+        <div class="order-card-footer">
+          <div style="font-size: 0.85rem; color: var(--text-muted);">
+            Payment: <strong>${(order.paymentMethod || "N/A").toUpperCase()}</strong>
+          </div>
+          <div style="font-size: 1.15rem; font-weight: 800;">
+            Grand Total: <span style="color: var(--secondary);">₹${order.total || 0}</span>
+          </div>
+        </div>
+      `;
+
+      return card;
+    }
+
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         orderList.innerHTML = '<div class="empty-orders">Please <a href="index.html" style="color: var(--primary); font-weight: 700; text-decoration: underline;">login</a> to view your orders.</div>';
         return;
       }
 
+      const uid = user.uid;
+      let cloudOrders = [];
+      let fetchedCloud = false;
+
       try {
         const q = query(
           collection(db, "orders"),
-          where("userId", "==", user.uid)
+          where("userId", "==", uid)
         );
-
         const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-          orderList.innerHTML = '<div class="empty-orders">No orders placed yet. Start glaming up your nails today! 🌸</div>';
-          return;
-        }
-
-        orderList.innerHTML = ""; // Clear loader
-
+        cloudOrders = [];
         querySnapshot.forEach((docSnap) => {
-          const order = docSnap.data();
-          const orderId = docSnap.id;
-
-          const card = document.createElement("div");
-          card.className = "order-card card-glass";
-
-          // Items display
-          let itemsHTML = "";
-          if (Array.isArray(order.items) && order.items.length > 0) {
-            itemsHTML = order.items.map(item => {
-              const image = item.image || "https://via.placeholder.com/60";
-              const name = item.name || "Product";
-              const price = item.price || 0;
-              const qty = item.qty || 1;
-              return `
-                <div class="ordered-item">
-                  <img src="${image}" alt="${name}">
-                  <div class="ordered-item-info">
-                    <div class="ordered-item-name">${name}</div>
-                    <div class="ordered-item-price">Quantity: ${qty} • Price: ₹${price}</div>
-                  </div>
-                  <div style="font-weight: 700;">₹${price * qty}</div>
-                </div>
-              `;
-            }).join("");
-          } else {
-            itemsHTML = `<div style="font-style: italic; color: var(--text-muted);">No items details found</div>`;
-          }
-
-          // Calculate status step highlights
-          const status = order.status || "Pending";
-          
-          let step1Active = "active";
-          let step2Active = "";
-          let step3Active = "";
-          let line1Active = "";
-          let line2Active = "";
-
-          if (status === "Shipped") {
-            step2Active = "active";
-            line1Active = "active";
-          } else if (status === "Delivered") {
-            step2Active = "active";
-            step3Active = "active";
-            line1Active = "active";
-            line2Active = "active";
-          }
-
-          card.innerHTML = `
-            <div class="order-card-header">
-              <div class="order-meta-info">
-                <div>Order Ref: <strong>#${orderId.substring(0, 8).toUpperCase()}</strong></div>
-                <div>Placed on: ${order.date || "N/A"}</div>
-              </div>
-              <div style="text-align: right;">
-                <span class="btn btn-secondary" style="font-size: 0.8rem; padding: 4px 10px; pointer-events: none;">${status}</span>
-              </div>
-            </div>
-
-            <!-- Live Tracking Timeline -->
-            <div class="tracking-timeline">
-              <div class="timeline-step ${step1Active}">
-                <span class="step-icon">✔</span>
-                <span class="step-label">Placed</span>
-              </div>
-              <div class="timeline-line ${line1Active}"></div>
-              <div class="timeline-step ${step2Active}">
-                <span class="step-icon">🚚</span>
-                <span class="step-label">Shipped</span>
-              </div>
-              <div class="timeline-line ${line2Active}"></div>
-              <div class="timeline-step ${step3Active}">
-                <span class="step-icon">🎁</span>
-                <span class="step-label">Delivered</span>
-              </div>
-            </div>
-
-            <!-- Items list -->
-            <div class="order-items-list">
-              ${itemsHTML}
-            </div>
-
-            <!-- Footer Details -->
-            <div class="order-card-footer">
-              <div style="font-size: 0.85rem; color: var(--text-muted);">
-                Payment: <strong>${(order.paymentMethod || "N/A").toUpperCase()}</strong>
-              </div>
-              <div style="font-size: 1.15rem; font-weight: 800;">
-                Grand Total: <span style="color: var(--secondary);">₹${order.total || 0}</span>
-              </div>
-            </div>
-          `;
-
-          orderList.appendChild(card);
+          cloudOrders.push({ id: docSnap.id, data: docSnap.data() });
         });
-
+        fetchedCloud = true;
       } catch (error) {
-        console.error("Fetch orders error:", error);
-        orderList.innerHTML = '<div class="empty-orders">⚠️ Error fetching orders records. Please try again later.</div>';
+        console.warn("Fetch orders from Firestore failed:", error);
+      }
+
+      // Merge locally saved orders for this user (guarantee reflect even if cloud is blocked)
+      let localOrders = [];
+      try {
+        const allLocal = JSON.parse(localStorage.getItem("nailArtLocalOrders") || "[]");
+        localOrders = allLocal.filter(o => (o.userId || "Guest") === uid);
+      } catch (e) { /* ignore malformed local orders */ }
+
+      const combined = [...cloudOrders, ...localOrders.map(o => ({ id: o.id || ("local-" + Date.now()), data: o }))].reverse();
+
+      if (combined.length === 0) {
+        orderList.innerHTML = fetchedCloud
+          ? '<div class="empty-orders">No orders placed yet. Start glaming up your nails today! 🌸</div>'
+          : '<div class="empty-orders">⚠️ Could not load orders. Please check your connection or login again.</div>';
+        return;
+      }
+
+      orderList.innerHTML = ""; // Clear loader
+      combined.forEach(({ id, data }) => {
+        orderList.appendChild(renderOrderCard(data, id));
+      });
+
+      // Show success toast if we just placed an order
+      const successMsg = localStorage.getItem("orderSuccessMsg");
+      if (successMsg) {
+        showToast(successMsg);
+        localStorage.removeItem("orderSuccessMsg");
       }
     });
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3500);
+    }
 
     const bubbles = document.querySelectorAll(".bubble");
     bubbles.forEach(b => {

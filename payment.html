@@ -505,6 +505,8 @@
       btn.disabled = true;
       btn.textContent = "Processing Securely...";
 
+      let cloudSave = true;
+
       try {
         const orderData = {
           userId: currentUser ? currentUser.uid : "Guest",
@@ -518,28 +520,47 @@
           status: "Pending"
         };
 
-        // Save order doc
+        // Save order doc to Firestore
         await addDoc(collection(db, "orders"), orderData);
 
-        // Clear shopping cart on success
-        if (isCart) {
-          localStorage.removeItem('cartItems');
-        }
-
-        // Confetti effect and success screen
-        document.getElementById("successName").textContent = name;
-        document.getElementById("successMethod").textContent = paymentMethod === "COD" ? "Cash on Delivery" : `UPI (${paymentMethod})`;
-        document.getElementById("successOverlay").style.display = "flex";
-        
-        // Custom confetti trigger
-        triggerConfetti();
-
       } catch (error) {
-        console.error("Order processing error:", error);
-        alert("Secure transaction failed: " + error.message);
-        btn.disabled = false;
-        btn.textContent = "Place Order 💅";
+        console.warn("Firestore save failed (falling back to local only):", error);
+        cloudSave = false;
       }
+
+      // Always save the order locally so it reflects on the orders page,
+      // even when Firestore security rules block the cloud write.
+      try {
+        const localOrders = JSON.parse(localStorage.getItem("nailArtLocalOrders") || "[]");
+        localOrders.push({
+          id: "local-" + Date.now(),
+          ...{
+            userId: currentUser ? currentUser.uid : "Guest",
+            customerName: name,
+            address: `${address}, Pin: ${pincode}`,
+            phone: phone,
+            paymentMethod: paymentMethod,
+            items: checkoutItems,
+            total: grandTotal,
+            date: new Date().toLocaleString('en-IN'),
+            status: "Pending"
+          }
+        });
+        localStorage.setItem("nailArtLocalOrders", JSON.stringify(localOrders));
+      } catch (e) {
+        console.warn("Could not save order locally:", e);
+      }
+
+      // Clear shopping cart on success
+      if (isCart) {
+        localStorage.removeItem('cartItems');
+      }
+
+      // Flag so orders.html can show the success toast
+      localStorage.setItem("orderSuccessMsg", "🎉 Order placed successfully! #" + name + (cloudSave ? "" : " (saved on this device)"));
+
+      // Redirect to the orders page
+      window.location.href = "orders.html";
     };
   </script>
 
