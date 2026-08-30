@@ -363,11 +363,11 @@
         console.warn("Fetch orders from Firestore failed:", error);
       }
 
-      // Merge locally saved orders for this user (guarantee reflect even if cloud is blocked)
+      // Merge locally saved orders for this user (per-user storage)
       let localOrders = [];
       try {
-        const allLocal = JSON.parse(localStorage.getItem("nailArtLocalOrders") || "[]");
-        localOrders = allLocal.filter(o => (o.userId || "Guest") === uid);
+        const localOrdersKey = "nailArtLocalOrders_" + uid;
+        localOrders = JSON.parse(localStorage.getItem(localOrdersKey) || "[]");
       } catch (e) { /* ignore malformed local orders */ }
 
       const combined = [...cloudOrders, ...localOrders.map(o => ({ id: o.id || ("local-" + Date.now()), data: o }))].reverse();

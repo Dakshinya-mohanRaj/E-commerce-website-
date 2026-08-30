@@ -248,10 +248,16 @@
         console.warn("Firestore read failed (showing local orders only):", error);
       }
 
-      // Merge locally saved orders so admin always sees what customers placed
+      // Merge locally saved orders from all users so admin sees everything
       let localOrders = [];
       try {
-        localOrders = JSON.parse(localStorage.getItem("nailArtLocalOrders") || "[]");
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith("nailArtLocalOrders_")) {
+            const arr = JSON.parse(localStorage.getItem(key) || "[]");
+            if (Array.isArray(arr)) localOrders = localOrders.concat(arr);
+          }
+        }
       } catch (e) { /* ignore malformed local orders */ }
 
       // De-duplicate: skip local orders that already exist in the cloud by reference
@@ -332,14 +338,19 @@
       // Local-order status updates (not backed by Firestore)
       if (String(orderId).startsWith("local-")) {
         try {
-          const allLocal = JSON.parse(localStorage.getItem("nailArtLocalOrders") || "[]");
-          const target = allLocal.find(o => o.id === orderId);
-          if (target) {
-            target.status = newStatus;
-            localStorage.setItem("nailArtLocalOrders", JSON.stringify(allLocal));
-            showLocalAlert(`💅 Order #${orderId.substring(0, 8).toUpperCase()} status shifted to: ${newStatus} (local)`);
-            loadOrders();
-            return;
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith("nailArtLocalOrders_")) {
+              const arr = JSON.parse(localStorage.getItem(key) || "[]");
+              const target = arr.find(o => o.id === orderId);
+              if (target) {
+                target.status = newStatus;
+                localStorage.setItem(key, JSON.stringify(arr));
+                showLocalAlert(`💅 Order #${orderId.substring(0, 8).toUpperCase()} status shifted to: ${newStatus} (local)`);
+                loadOrders();
+                return;
+              }
+            }
           }
         } catch (e) { /* ignore */ }
       }

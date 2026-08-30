@@ -1292,6 +1292,9 @@
       }
 
       currentUser = user;
+      // Record the active user's UID so the cart/profile scripts can scope their storage per user
+      try { sessionStorage.setItem("currentUid", user.uid); } catch (e) {}
+      if (typeof window.reloadCartForUser === "function") window.reloadCartForUser();
       const ADMIN_EMAIL = "admin@gmail.com";
       if (user.email === ADMIN_EMAIL) {
         document.getElementById("adminBtn").style.display = "flex";
@@ -1311,7 +1314,8 @@
         console.error("Firestore profile read error:", e);
       }
       if (!profile) {
-        const local = localStorage.getItem("userProfile");
+        const localKey = "userProfile_" + user.uid;
+        const local = localStorage.getItem(localKey);
         if (local) {
           try { profile = JSON.parse(local); } catch (e) { profile = null; }
         }
@@ -1353,7 +1357,7 @@
         updatedAt: new Date().toISOString()
       };
 
-      localStorage.setItem("userProfile", JSON.stringify(profile));
+      localStorage.setItem("userProfile_" + currentUser.uid, JSON.stringify(profile));
 
       try {
         await setDoc(doc(db, "users", currentUser.uid), profile);
@@ -1380,7 +1384,13 @@
   <!-- Core Page Logic -->
   <script>
     // State
-    let cart = JSON.parse(localStorage.getItem('cartItems') || '[]');
+    function currentCartKey() {
+      let uid = "guest";
+      try { uid = sessionStorage.getItem("currentUid") || "guest"; } catch (e) {}
+      return "cartItems_" + uid;
+    }
+    let cart = [];
+    try { cart = JSON.parse(localStorage.getItem(currentCartKey()) || '[]'); } catch (e) { cart = []; }
     let activeModalQty = 1;
     let selectedProductDetails = null;
 
@@ -1445,8 +1455,14 @@
 
     // Cart Management
     function saveCart() {
-      localStorage.setItem('cartItems', JSON.stringify(cart));
+      localStorage.setItem(currentCartKey(), JSON.stringify(cart));
     }
+
+    // Reload cart from storage for the currently signed-in user (called after auth resolves)
+    window.reloadCartForUser = function () {
+      try { cart = JSON.parse(localStorage.getItem(currentCartKey()) || '[]'); } catch (e) { cart = []; }
+      updateCartDisplay();
+    };
 
     function addToCart(name, price, image, event, qtyToAdd = 1) {
       const existing = cart.find(item => item.name === name);
