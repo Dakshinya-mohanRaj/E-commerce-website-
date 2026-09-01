@@ -307,9 +307,9 @@ dialog.show-anim {
 .bubble.medium { width: 130px; height: 130px; }
 .bubble.large { width: 220px; height: 220px; }
 
-.bubble.pink { background: radial-gradient(circle, #f0dcc8 0%, #d8b890 100%); }
-.bubble.purple { background: radial-gradient(circle, #e6cfa8 0%, #c9a06e 100%); }
-.bubble.blue { background: radial-gradient(circle, #d9c3a6 0%, #b8986e 100%); }
+.bubble.pink { background: radial-gradient(circle, #c99a6b 0%, #8a5f34 100%); }
+.bubble.purple { background: radial-gradient(circle, #ad8460 0%, #77502e 100%); }
+.bubble.blue { background: radial-gradient(circle, #b08f64 0%, #7c5a33 100%); }
 
 @keyframes rise {
   0% { transform: translateY(0) scale(0.9) rotate(0deg); opacity: 0; }
