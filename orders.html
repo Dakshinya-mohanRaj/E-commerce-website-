@@ -338,6 +338,17 @@
       return card;
     }
 
+    // Build a unique fingerprint for an order so we can de-duplicate
+    // between the Firestore copy and the local-storage copy of the same order.
+    function orderKey(order) {
+      return [
+        order.date || "",
+        order.total || 0,
+        order.paymentMethod || "",
+        (order.items || []).map(it => (it.name || "") + "x" + (it.qty || 1)).join(",")
+      ].join("|");
+    }
+
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         orderList.innerHTML = '<div class="empty-orders">Please <a href="index.html" style="color: var(--primary); font-weight: 700; text-decoration: underline;">login</a> to view your orders.</div>';
@@ -370,7 +381,19 @@
         localOrders = JSON.parse(localStorage.getItem(localOrdersKey) || "[]");
       } catch (e) { /* ignore malformed local orders */ }
 
-      const combined = [...cloudOrders, ...localOrders.map(o => ({ id: o.id || ("local-" + Date.now()), data: o }))].reverse();
+      // De-duplicate: skip local copies that already exist in the cloud,
+      // so an order isn't shown twice (it's saved to both Firestore and localStorage).
+      const cloudKeys = new Set(cloudOrders.map(o => orderKey(o.data)));
+      const uniqueLocal = localOrders.filter(o => !cloudKeys.has(orderKey(o)));
+
+      const combined = [...cloudOrders, ...uniqueLocal.map(o => ({ id: o.id || ("local-" + Date.now()), data: o }))].reverse();
+
+      // Also prune the duplicate local entries from storage
+      try {
+        if (uniqueLocal.length !== localOrders.length) {
+          localStorage.setItem("nailArtLocalOrders_" + uid, JSON.stringify(uniqueLocal));
+        }
+      } catch (e) { /* ignore */ }
 
       if (combined.length === 0) {
         orderList.innerHTML = fetchedCloud

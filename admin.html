@@ -233,6 +233,17 @@
       }
     });
 
+    // Build a unique fingerprint for an order to de-duplicate the cloud copy
+    // from the local-storage copy of the same order.
+    function orderKey(order) {
+      return [
+        order.date || "",
+        order.total || 0,
+        order.paymentMethod || "",
+        (order.items || []).map(it => (it.name || "") + "x" + (it.qty || 1)).join(",")
+      ].join("|");
+    }
+
     async function loadOrders() {
       const orderTableBody = document.getElementById("orderTableBody");
       orderTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Connecting to registry database...</td></tr>';
@@ -260,10 +271,14 @@
         }
       } catch (e) { /* ignore malformed local orders */ }
 
-      // De-duplicate: skip local orders that already exist in the cloud by reference
+      // De-duplicate: skip local copies that already exist in the cloud,
+      // so a synced order isn't shown twice (once as cloud, once tagged local).
+      const cloudFingerprints = new Set(cloudOrders.map(o => orderKey(o.data)));
+      const uniqueLocal = localOrders.filter(o => !cloudFingerprints.has(orderKey(o)));
+
       const combined = [
         ...cloudOrders.map(o => ({ id: o.id, data: o.data, local: false })),
-        ...localOrders.map(o => ({ id: o.id || ("local-" + Date.now()), data: o, local: true }))
+        ...uniqueLocal.map(o => ({ id: o.id || ("local-" + Date.now()), data: o, local: true }))
       ];
 
       orderTableBody.innerHTML = '';
