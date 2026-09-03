@@ -18,13 +18,16 @@
       overflow: hidden;
       position: relative;
       box-shadow: var(--shadow-md);
+      background: linear-gradient(135deg, #1a1a2e, #2d1b3d);
     }
     .carousel-slide {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
       display: flex;
       align-items: center;
-      padding: 0 4rem;
+      justify-content: center;
+      gap: 3rem;
+      padding: 1.5rem 4rem;
       color: white;
       opacity: 0;
       transition: opacity 0.8s ease-in-out;
@@ -34,10 +37,47 @@
       opacity: 1;
       pointer-events: auto;
     }
+    /* Blurred full-banner backdrop */
+    .carousel-backdrop {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      filter: blur(12px);
+      transform: scale(1.15);
+      opacity: 0.45;
+      z-index: 1;
+    }
+    /* Sharp centered image card */
+    .carousel-media {
+      position: relative;
+      z-index: 5;
+      flex-shrink: 0;
+      width: 230px;
+      height: 300px;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      border: 2px solid rgba(255,255,255,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #2a2a3a;
+    }
+    .carousel-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      image-rendering: auto;
+    }
     .hero-content {
-      max-width: 600px;
+      position: relative;
+      z-index: 5;
+      max-width: 520px;
       animation: fadeInUp 1s ease;
-      z-index: 10;
     }
     .hero-content .badge {
       display: inline-block;
@@ -489,10 +529,15 @@
 
     @media(max-width: 768px) {
       .hero-carousel {
-        height: 280px;
+        height: 300px;
       }
       .carousel-slide {
-        padding: 0 2rem;
+        padding: 0 1.5rem;
+        gap: 1.25rem;
+      }
+      .carousel-media {
+        width: 150px;
+        height: 190px;
       }
       .carousel-arrow {
         width: 34px;
@@ -585,7 +630,11 @@
     
     <!-- Promo Carousel (rotating ads) -->
     <section class="hero-carousel" id="heroCarousel">
-      <div class="carousel-slide active" style="background: linear-gradient(to right, rgba(0,0,0,0.6) 20%, rgba(0,0,0,0.2) 100%), url('p20.jpg') center/cover;">
+      <div class="carousel-slide active">
+        <div class="carousel-backdrop" style="background-image: url('p20.jpg');"></div>
+        <div class="carousel-media">
+          <img src="p20.jpg" alt="Sculpt Your Perfect Style" class="carousel-img" />
+        </div>
         <div class="hero-content">
           <span class="badge">Limited Deal 🌸</span>
           <h2>Sculpt Your Perfect Style</h2>
@@ -594,7 +643,11 @@
         </div>
       </div>
 
-      <div class="carousel-slide" style="background: linear-gradient(to right, rgba(0,0,0,0.55) 20%, rgba(0,0,0,0.1) 100%), url('p5.jpeg') center/cover;">
+      <div class="carousel-slide">
+        <div class="carousel-backdrop" style="background-image: url('p5.jpeg');"></div>
+        <div class="carousel-media">
+          <img src="p5.jpeg" alt="Glossy Gel Polish Set" class="carousel-img" />
+        </div>
         <div class="hero-content">
           <span class="badge">New Arrival 💕</span>
           <h2>Glossy Gel Polish Set</h2>
@@ -603,7 +656,11 @@
         </div>
       </div>
 
-      <div class="carousel-slide" style="background: linear-gradient(to right, rgba(0,0,0,0.55) 20%, rgba(0,0,0,0.1) 100%), url('p11.jpeg') center/cover;">
+      <div class="carousel-slide">
+        <div class="carousel-backdrop" style="background-image: url('p11.jpeg');"></div>
+        <div class="carousel-media">
+          <img src="p11.jpeg" alt="Press-on Perfection" class="carousel-img" />
+        </div>
         <div class="hero-content">
           <span class="badge">Press-on Perfection ✨</span>
           <h2>Salon Look, Zero Wait</h2>
@@ -612,7 +669,11 @@
         </div>
       </div>
 
-      <div class="carousel-slide" style="background: linear-gradient(to right, rgba(0,0,0,0.55) 20%, rgba(0,0,0,0.1) 100%), url('P10.jpeg') center/cover;">
+      <div class="carousel-slide">
+        <div class="carousel-backdrop" style="background-image: url('P10.jpeg');"></div>
+        <div class="carousel-media">
+          <img src="P10.jpeg" alt="Care and Prep" class="carousel-img" />
+        </div>
         <div class="hero-content">
           <span class="badge">Care & Prep 🛡️</span>
           <h2>Healthy Nails, Happy Hands</h2>
